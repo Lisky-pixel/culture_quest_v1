@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../models/event.dart';
+import '../services/api_service.dart';
 
 class EventsScreen extends StatefulWidget {
   const EventsScreen({Key? key}) : super(key: key);
@@ -9,6 +11,22 @@ class EventsScreen extends StatefulWidget {
 
 class _EventsScreenState extends State<EventsScreen> {
   int _selectedIndex = 1;
+  List<Event> _events = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchEvents();
+  }
+
+  Future<void> _fetchEvents() async {
+    final events = await ApiService.fetchEvents();
+    setState(() {
+      _events = events;
+      _isLoading = false;
+    });
+  }
 
   void _onItemTapped(int index) {
     switch (index) {
@@ -70,58 +88,34 @@ class _EventsScreenState extends State<EventsScreen> {
               ),
               const SizedBox(height: 16),
               Expanded(
-                child: ListView(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pushNamed(context, '/event_details');
-                      },
-                      child: const _EventListItem(
-                        category: 'Music',
-                        title: 'Afrobeat Fusion Night',
-                        description:
-                            'Experience the vibrant rhythms of Afrobeat combined with modern electronic sounds. Featuring DJ Kojo and live performances.',
-                        imagePath: 'assets/images/afrobeat.png',
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pushNamed(context, '/event_details');
-                      },
-                      child: const _EventListItem(
-                        category: 'Culture',
-                        title: 'Traditional Dance Workshop',
-                        description:
-                            'Learn the steps and stories behind traditional dances from various regions. Open to all skill levels.',
-                        imagePath: 'assets/images/dance.png',
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pushNamed(context, '/event_details');
-                      },
-                      child: const _EventListItem(
-                        category: 'Music',
-                        title: 'Highlife Revival Concert',
-                        description:
-                            'Celebrate the golden era of Highlife music with legendary artists and contemporary performers.',
-                        imagePath: 'assets/images/highlife.png',
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pushNamed(context, '/event_details');
-                      },
-                      child: const _EventListItem(
-                        category: 'Culture',
-                        title: 'Storytelling Under the Stars',
-                        description:
-                            'Gather around for an evening of captivating tales and folklore shared by master storytellers.',
-                        imagePath: 'assets/images/storytelling.png',
-                      ),
-                    ),
-                  ],
-                ),
+                child: _isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : _events.isEmpty
+                        ? const Center(child: Text('No events found'))
+                        : ListView.builder(
+                            itemCount: _events.length,
+                            itemBuilder: (context, index) {
+                              final event = _events[index];
+                              return GestureDetector(
+                                onTap: () {
+                                  Navigator.pushNamed(
+                                    context,
+                                    '/event_details',
+                                    arguments: event,
+                                  );
+                                },
+                                child: _EventListItem(
+                                  category: event.category,
+                                  title: event.title,
+                                  description: event.description,
+                                  imagePath: event.images.isNotEmpty
+                                      ? event.images.first
+                                      : 'assets/images/event1.png',
+                                  isNetworkImage: event.images.isNotEmpty,
+                                ),
+                              );
+                            },
+                          ),
               ),
             ],
           ),
@@ -184,11 +178,13 @@ class _EventListItem extends StatelessWidget {
   final String title;
   final String description;
   final String imagePath;
+  final bool isNetworkImage;
   const _EventListItem({
     required this.category,
     required this.title,
     required this.description,
     required this.imagePath,
+    this.isNetworkImage = false,
     Key? key,
   }) : super(key: key);
 
@@ -233,12 +229,25 @@ class _EventListItem extends StatelessWidget {
           const SizedBox(width: 16),
           ClipRRect(
             borderRadius: BorderRadius.circular(16),
-            child: Image.asset(
-              imagePath,
-              width: 90,
-              height: 90,
-              fit: BoxFit.cover,
-            ),
+            child: isNetworkImage
+                ? Image.network(
+                    imagePath,
+                    width: 90,
+                    height: 90,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => Image.asset(
+                      'assets/images/event1.png',
+                      width: 90,
+                      height: 90,
+                      fit: BoxFit.cover,
+                    ),
+                  )
+                : Image.asset(
+                    imagePath,
+                    width: 90,
+                    height: 90,
+                    fit: BoxFit.cover,
+                  ),
           ),
         ],
       ),

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../models/event.dart';
+import '../services/api_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -9,6 +11,22 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
+  List<Event> _events = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchEvents();
+  }
+
+  Future<void> _fetchEvents() async {
+    final events = await ApiService.fetchEvents();
+    setState(() {
+      _events = events;
+      _isLoading = false;
+    });
+  }
 
   void _onItemTapped(int index) {
     switch (index) {
@@ -93,26 +111,37 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(height: 12),
                 SizedBox(
                   height: 190, // Increased height to prevent overflow
-                  child: ListView(
-                    scrollDirection: Axis.horizontal,
-                    children: const [
-                      _EventCard(
-                        imagePath:
-                            'assets/images/event1.png', // TODO: Replace with actual image
-                        title: 'Dance of the Ancestors',
-                        description:
-                            'Experience the vibrant energy of traditional African dance.',
-                      ),
-                      SizedBox(width: 16),
-                      _EventCard(
-                        imagePath:
-                            'assets/images/event2.png', // TODO: Replace with actual image
-                        title: 'Rhythms of the Continent',
-                        description:
-                            'Immerse yourself in the rich musical heritage of Africa.',
-                      ),
-                    ],
-                  ),
+                  child: _isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : _events.isEmpty
+                          ? const Center(child: Text('No events found'))
+                          : ListView.separated(
+                              scrollDirection: Axis.horizontal,
+                              itemCount:
+                                  _events.length > 2 ? 2 : _events.length,
+                              separatorBuilder: (context, index) =>
+                                  const SizedBox(width: 16),
+                              itemBuilder: (context, index) {
+                                final event = _events[index];
+                                return GestureDetector(
+                                  onTap: () {
+                                    Navigator.pushNamed(
+                                      context,
+                                      '/event_details',
+                                      arguments: event,
+                                    );
+                                  },
+                                  child: _EventCard(
+                                    imagePath: event.images.isNotEmpty
+                                        ? event.images.first
+                                        : 'assets/images/event1.png',
+                                    isNetworkImage: event.images.isNotEmpty,
+                                    title: event.title,
+                                    description: event.description,
+                                  ),
+                                );
+                              },
+                            ),
                 ),
                 const SizedBox(height: 24),
                 const Text(
@@ -191,11 +220,13 @@ class _EventCard extends StatelessWidget {
   final String imagePath;
   final String title;
   final String description;
+  final bool isNetworkImage;
 
   const _EventCard({
     required this.imagePath,
     required this.title,
     required this.description,
+    this.isNetworkImage = false,
     Key? key,
   }) : super(key: key);
 
@@ -222,12 +253,25 @@ class _EventCard extends StatelessWidget {
               topLeft: Radius.circular(16),
               topRight: Radius.circular(16),
             ),
-            child: Image.asset(
-              imagePath,
-              height: 100,
-              width: double.infinity,
-              fit: BoxFit.cover,
-            ),
+            child: isNetworkImage
+                ? Image.network(
+                    imagePath,
+                    height: 100,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => Image.asset(
+                      'assets/images/event1.png',
+                      height: 100,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    ),
+                  )
+                : Image.asset(
+                    imagePath,
+                    height: 100,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  ),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -280,7 +324,7 @@ class _StoryCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
             color: Colors.black12,
             blurRadius: 4,
