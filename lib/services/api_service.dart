@@ -1,12 +1,15 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import '../models/event.dart';
 
 class ApiService {
-  static const String baseUrl = 'https://culture-quest-app-backend.onrender.com';
-  
+  static const String baseUrl =
+      'https://culture-quest-app-backend.onrender.com';
+
   // Login user
-  static Future<Map<String, dynamic>> login(String email, String password) async {
+  static Future<Map<String, dynamic>> login(
+      String email, String password) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/auth/login'),
@@ -142,6 +145,26 @@ class ApiService {
         'success': false,
         'message': 'Network error. Please check your connection.',
       };
+    }
+  }
+
+  // Fetch events
+  static Future<List<Event>> fetchEvents() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/events'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+        return data.map((e) => Event.fromJson(e)).toList();
+      } else {
+        return [];
+      }
+    } catch (e) {
+      return [];
     }
   }
 }
