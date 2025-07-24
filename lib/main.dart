@@ -1,47 +1,122 @@
 import 'package:flutter/material.dart';
-import 'screens/welcome_screen.dart';
-import 'screens/login_screen.dart';
-import 'screens/signup_screen.dart';
-import 'screens/get_started_screen.dart';
-import 'screens/home_screen.dart';
-import 'screens/events_screen.dart';
-import 'screens/event_details_screen.dart';
-import 'screens/stories_screen.dart';
-import 'screens/story_details_screen.dart';
-import 'screens/artisans_screen.dart';
-import 'screens/artisan_profile_screen.dart';
-import 'screens/profile_screen.dart';
+import './screens/welcome_screen.dart';
+import './screens/login_screen.dart';
+import './screens/signup_screen.dart';
+// Import your home screen here
+// import 'home_screen.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const CultureQuestApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class CultureQuestApp extends StatelessWidget {
+  const CultureQuestApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Culture Quest',
+      title: 'CultureQuest',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+        primarySwatch: Colors.orange,
+        primaryColor: const Color(0xFFF1872D),
+        fontFamily: 'Inter', // Make sure to add this font to your assets
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+        // Custom theme settings
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24),
+            ),
+          ),
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: const Color(0xFFF5F1EE),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none,
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 18, 
+            horizontal: 16,
+          ),
+        ),
       ),
+      // Set the initial route to welcome screen
       initialRoute: '/',
       routes: {
-        '/': (context) => const GetStartedScreen(),
-        '/welcome': (context) => const WelcomeScreen(),
+        '/': (context) => const WelcomeScreen(),
         '/login': (context) => const LoginScreen(),
         '/signup': (context) => const SignupScreen(),
-        '/home': (context) => const HomeScreen(),
-        '/events': (context) => const EventsScreen(),
-        '/event_details': (context) => const EventDetailsScreen(),
-        '/stories': (context) => const StoriesScreen(),
-        '/story_details': (context) => const StoryDetailsScreen(),
-        '/artisans': (context) => const ArtisansScreen(),
-        '/artisan_profile': (context) => const ArtisanProfileScreen(),
-        '/profile': (context) => const ProfileScreen(),
+        // Add your home screen route here
+        // '/home': (context) => const HomeScreen(),
       },
+      // Handle unknown routes
+      onUnknownRoute: (settings) {
+        return MaterialPageRoute(
+          builder: (context) => const WelcomeScreen(),
+        );
+      },
+      debugShowCheckedModeBanner: false,
+    );
+  }
+}
+
+// Placeholder home screen - replace with your actual home screen
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('CultureQuest'),
+        backgroundColor: const Color(0xFFF1872D),
+        foregroundColor: Colors.white,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () async {
+              // Logout functionality
+              //await ApiService.logout();
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                '/',
+                (route) => false,
+              );
+            },
+          ),
+        ],
+      ),
+      body: const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.home,
+              size: 64,
+              color: Color(0xFFF1872D),
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Welcome to CultureQuest!',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'This is your home screen.',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
