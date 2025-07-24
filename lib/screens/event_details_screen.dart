@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
+import '../models/event.dart';
 
 class EventDetailsScreen extends StatelessWidget {
   const EventDetailsScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final event = ModalRoute.of(context)?.settings.arguments as Event?;
+    if (event == null) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Event Details')),
+        body: const Center(child: Text('No event data provided.')),
+      );
+    }
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -37,10 +45,20 @@ class EventDetailsScreen extends StatelessWidget {
               color: const Color(0xFFF7EFE7),
               child: AspectRatio(
                 aspectRatio: 2.2,
-                child: Image.asset(
-                  'assets/images/event_details.png', // TODO: Replace with actual image
-                  fit: BoxFit.cover,
-                ),
+                child: event.images.isNotEmpty
+                    ? Image.network(
+                        event.images.first,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) =>
+                            Image.asset(
+                          'assets/images/event_details.png',
+                          fit: BoxFit.cover,
+                        ),
+                      )
+                    : Image.asset(
+                        'assets/images/event_details.png',
+                        fit: BoxFit.cover,
+                      ),
               ),
             ),
             Expanded(
@@ -51,17 +69,17 @@ class EventDetailsScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'The Rhythms of Africa',
-                        style: TextStyle(
+                      Text(
+                        event.title,
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 22,
                         ),
                       ),
                       const SizedBox(height: 12),
-                      const Text(
-                        'Join us for an evening celebrating the rich tapestry of African music and dance. Experience the vibrant rhythms and captivating performances that have shaped cultures across the continent.',
-                        style: TextStyle(
+                      Text(
+                        event.description,
+                        style: const TextStyle(
                           fontSize: 15,
                           color: Colors.black87,
                         ),
@@ -75,9 +93,9 @@ class EventDetailsScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 6),
-                      const Text(
-                        'Saturday, July 20, 2024 · 7:00 PM - 10:00 PM',
-                        style: TextStyle(
+                      Text(
+                        _formatEventDateTime(event),
+                        style: const TextStyle(
                           fontSize: 15,
                           color: Colors.black87,
                         ),
@@ -91,19 +109,20 @@ class EventDetailsScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 10),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(16),
-                        child: Image.asset(
-                          'assets/images/ghana_map.png', // TODO: Replace with actual image
-                          height: 100,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
+                      if (event.coordinates != null)
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(16),
+                          child: Image.asset(
+                            'assets/images/ghana_map.png',
+                            height: 100,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                          ),
                         ),
-                      ),
                       const SizedBox(height: 10),
-                      const Text(
-                        'Accra International Conference Centre, Accra, Ghana',
-                        style: TextStyle(
+                      Text(
+                        event.venue.isNotEmpty ? event.venue : event.address,
+                        style: const TextStyle(
                           fontSize: 15,
                           color: Colors.black87,
                         ),
@@ -118,4 +137,16 @@ class EventDetailsScreen extends StatelessWidget {
       ),
     );
   }
+
+  String _formatEventDateTime(Event event) {
+    final start = event.startDate;
+    final end = event.endDate;
+    final date =
+        '${start.year}-${_twoDigits(start.month)}-${_twoDigits(start.day)}';
+    final startTime = '${_twoDigits(start.hour)}:${_twoDigits(start.minute)}';
+    final endTime = '${_twoDigits(end.hour)}:${_twoDigits(end.minute)}';
+    return '$date · $startTime - $endTime';
+  }
+
+  String _twoDigits(int n) => n.toString().padLeft(2, '0');
 }
