@@ -64,8 +64,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   padding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: Row(
-                    children: const [
+                  child: const Row(
+                    children: [
                       Icon(Icons.search, color: Colors.black45),
                       SizedBox(width: 8),
                       Expanded(
@@ -95,7 +95,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   height: 190, // Increased height to prevent overflow
                   child: ListView(
                     scrollDirection: Axis.horizontal,
-                    children: [
+                    children: const [
                       _EventCard(
                         imagePath:
                             'assets/images/event1.png', // TODO: Replace with actual image
@@ -103,7 +103,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         description:
                             'Experience the vibrant energy of traditional African dance.',
                       ),
-                      const SizedBox(width: 16),
+                      SizedBox(width: 16),
                       _EventCard(
                         imagePath:
                             'assets/images/event2.png', // TODO: Replace with actual image
@@ -124,7 +124,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                Row(
+                const Row(
                   children: [
                     Expanded(
                       child: _StoryCard(
@@ -135,7 +135,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             'Discover captivating stories from the heart of Africa.',
                       ),
                     ),
-                    const SizedBox(width: 16),
+                    SizedBox(width: 16),
                     Expanded(
                       child: _StoryCard(
                         imagePath:
@@ -206,7 +206,7 @@ class _EventCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
             color: Colors.black12,
             blurRadius: 4,

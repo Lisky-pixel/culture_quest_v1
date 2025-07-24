@@ -44,9 +44,9 @@ class _EventsScreenState extends State<EventsScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 16),
-              Row(
+              const Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
+                children: [
                   Text(
                     'CultureQuest',
                     style: TextStyle(
@@ -59,12 +59,12 @@ class _EventsScreenState extends State<EventsScreen> {
                 ],
               ),
               const SizedBox(height: 16),
-              Row(
+              const Row(
                 children: [
                   _FilterChip(label: 'Category', icon: Icons.category),
-                  const SizedBox(width: 8),
+                  SizedBox(width: 8),
                   _FilterChip(label: 'Date', icon: Icons.calendar_today),
-                  const SizedBox(width: 8),
+                  SizedBox(width: 8),
                   _FilterChip(label: 'Location', icon: Icons.location_on),
                 ],
               ),

@@ -70,8 +70,8 @@ class _ArtisansScreenState extends State<ArtisansScreen> {
                 ),
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: Row(
-                  children: const [
+                child: const Row(
+                  children: [
                     Icon(Icons.search, color: Colors.black45),
                     SizedBox(width: 8),
                     Expanded(

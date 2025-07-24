@@ -36,41 +36,30 @@ class ArtisanProfileScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 // Profile image
-                CircleAvatar(
+                const CircleAvatar(
                   radius: 54,
                   backgroundImage: AssetImage(
-                      'assets/images/artisan_profile.png'), // TODO: Replace with actual image
+                    'assets/images/artisan_profile.png',
+                  ), // TODO: Replace with actual image
                 ),
                 const SizedBox(height: 20),
                 const Text(
                   'Omar Marmoush',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 22,
-                  ),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
                 ),
                 const SizedBox(height: 4),
                 const Text(
                   'Traditional Weaver',
-                  style: TextStyle(
-                    color: Color(0xFFB49A87),
-                    fontSize: 16,
-                  ),
+                  style: TextStyle(color: Color(0xFFB49A87), fontSize: 16),
                 ),
                 const Text(
                   'Marrakesh, Morocco',
-                  style: TextStyle(
-                    color: Color(0xFFB49A87),
-                    fontSize: 15,
-                  ),
+                  style: TextStyle(color: Color(0xFFB49A87), fontSize: 15),
                 ),
                 const SizedBox(height: 16),
                 const Text(
                   'Omar Marmoush is a master weaver from Marrakesh, Morocco, known for his intricate designs and use of natural dyes. His work reflects the rich cultural heritage of the Moroccan people, blending traditional techniques with contemporary aesthetics.',
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: Colors.black87,
-                  ),
+                  style: TextStyle(fontSize: 15, color: Colors.black87),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 24),
@@ -79,10 +68,7 @@ class ArtisanProfileScreen extends StatelessWidget {
                   alignment: Alignment.centerLeft,
                   child: Text(
                     'Gallery',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -90,11 +76,11 @@ class ArtisanProfileScreen extends StatelessWidget {
                   height: 70,
                   child: ListView(
                     scrollDirection: Axis.horizontal,
-                    children: [
+                    children: const [
                       _GalleryImage(imagePath: 'assets/images/gallery1.png'),
-                      const SizedBox(width: 12),
+                      SizedBox(width: 12),
                       _GalleryImage(imagePath: 'assets/images/gallery2.png'),
-                      const SizedBox(width: 12),
+                      SizedBox(width: 12),
                       _GalleryImage(imagePath: 'assets/images/gallery3.png'),
                     ],
                   ),
@@ -105,17 +91,14 @@ class ArtisanProfileScreen extends StatelessWidget {
                   alignment: Alignment.centerLeft,
                   child: Text(
                     'Specialties',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                 ),
                 const SizedBox(height: 10),
-                Wrap(
+                const Wrap(
                   spacing: 10,
                   runSpacing: 8,
-                  children: const [
+                  children: [
                     _SpecialtyChip(label: 'Textile Art'),
                     _SpecialtyChip(label: 'Natural Dyes'),
                     _SpecialtyChip(label: 'Yoruba Weaving'),
@@ -162,12 +145,7 @@ class _GalleryImage extends StatelessWidget {
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(12),
-      child: Image.asset(
-        imagePath,
-        width: 70,
-        height: 70,
-        fit: BoxFit.cover,
-      ),
+      child: Image.asset(imagePath, width: 70, height: 70, fit: BoxFit.cover),
     );
   }
 }
@@ -186,10 +164,7 @@ class _SpecialtyChip extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: const TextStyle(
-          color: Colors.black87,
-          fontSize: 14,
-        ),
+        style: const TextStyle(color: Colors.black87, fontSize: 14),
       ),
     );
   }

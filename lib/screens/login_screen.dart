@@ -73,8 +73,9 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     try {
-      final result = await ApiService.forgotPassword(_emailController.text.trim());
-      
+      final result =
+          await ApiService.forgotPassword(_emailController.text.trim());
+
       if (result['success']) {
         _showSnackBar(result['message']);
       } else {

@@ -5,8 +5,8 @@ class StoryDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    int _selectedIndex = 2;
-    void _onItemTapped(int index) {
+    int selectedIndex = 2;
+    void onItemTapped(int index) {
       switch (index) {
         case 0:
           Navigator.pushReplacementNamed(context, '/home');
@@ -157,8 +157,8 @@ class StoryDetailsScreen extends StatelessWidget {
       ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
+        currentIndex: selectedIndex,
+        onTap: onItemTapped,
         selectedItemColor: Colors.black,
         unselectedItemColor: Colors.black45,
         showUnselectedLabels: true,
