@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/event.dart';
 import '../models/story.dart';
+import '../models/artisan.dart';
 
 class ApiService {
   static const String baseUrl =
@@ -186,6 +187,46 @@ class ApiService {
       }
     } catch (e) {
       return [];
+    }
+  }
+
+  // Fetch artisans
+  static Future<List<Artisan>> fetchArtisans() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/artisans'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+        return data.map((e) => Artisan.fromJson(e)).toList();
+      } else {
+        return [];
+      }
+    } catch (e) {
+      return [];
+    }
+  }
+
+  // Fetch single artisan by ID
+  static Future<Artisan?> fetchArtisanById(String id) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/artisans/$id'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return Artisan.fromJson(data);
+      } else {
+        return null;
+      }
+    } catch (e) {
+      return null;
     }
   }
 }

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../models/artisan.dart';
+import '../services/api_service.dart';
 
 class ArtisansScreen extends StatefulWidget {
   const ArtisansScreen({Key? key}) : super(key: key);
@@ -9,6 +11,22 @@ class ArtisansScreen extends StatefulWidget {
 
 class _ArtisansScreenState extends State<ArtisansScreen> {
   int _selectedIndex = 3;
+  List<Artisan> _artisans = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchArtisans();
+  }
+
+  Future<void> _fetchArtisans() async {
+    final artisans = await ApiService.fetchArtisans();
+    setState(() {
+      _artisans = artisans;
+      _isLoading = false;
+    });
+  }
 
   void _onItemTapped(int index) {
     switch (index) {
@@ -91,68 +109,36 @@ class _ArtisansScreenState extends State<ArtisansScreen> {
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                child: GridView.count(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
-                  childAspectRatio: 0.75, // Make cards taller for bigger images
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pushNamed(context, '/artisan_profile');
-                      },
-                      child: const _ArtisanCard(
-                        imagePath: 'assets/images/artisan1.png',
-                        name: 'Kwame Nkrumah',
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pushNamed(context, '/artisan_profile');
-                      },
-                      child: const _ArtisanCard(
-                        imagePath: 'assets/images/artisan2.png',
-                        name: 'Ineza Mutoni',
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pushNamed(context, '/artisan_profile');
-                      },
-                      child: const _ArtisanCard(
-                        imagePath: 'assets/images/artisan3.png',
-                        name: 'Chukwudi Okoro',
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pushNamed(context, '/artisan_profile');
-                      },
-                      child: const _ArtisanCard(
-                        imagePath: 'assets/images/artisan4.png',
-                        name: 'Fatima Hassan',
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pushNamed(context, '/artisan_profile');
-                      },
-                      child: const _ArtisanCard(
-                        imagePath: 'assets/images/artisan5.png',
-                        name: 'Samuel Boateng',
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pushNamed(context, '/artisan_profile');
-                      },
-                      child: const _ArtisanCard(
-                        imagePath: 'assets/images/artisan6.png',
-                        name: 'Amina Bello',
-                      ),
-                    ),
-                  ],
-                ),
+                child: _isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : _artisans.isEmpty
+                        ? const Center(child: Text('No artisans found'))
+                        : GridView.count(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 16,
+                            mainAxisSpacing: 16,
+                            childAspectRatio:
+                                0.75, // Make cards taller for bigger images
+                            children: List.generate(_artisans.length, (index) {
+                              final artisan = _artisans[index];
+                              return GestureDetector(
+                                onTap: () {
+                                  Navigator.pushNamed(
+                                    context,
+                                    '/artisan_profile',
+                                    arguments: artisan,
+                                  );
+                                },
+                                child: _ArtisanCard(
+                                  imagePath: artisan.gallery.isNotEmpty
+                                      ? artisan.gallery.first.url
+                                      : 'assets/images/artisan1.png',
+                                  isNetworkImage: artisan.gallery.isNotEmpty,
+                                  name: artisan.name,
+                                ),
+                              );
+                            }),
+                          ),
               ),
             ),
           ],
@@ -195,7 +181,12 @@ class _ArtisansScreenState extends State<ArtisansScreen> {
 class _ArtisanCard extends StatelessWidget {
   final String imagePath;
   final String name;
-  const _ArtisanCard({required this.imagePath, required this.name, Key? key})
+  final bool isNetworkImage;
+  const _ArtisanCard(
+      {required this.imagePath,
+      required this.name,
+      this.isNetworkImage = false,
+      Key? key})
       : super(key: key);
 
   @override
@@ -207,11 +198,22 @@ class _ArtisanCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           child: AspectRatio(
             aspectRatio: 1,
-            child: Image.asset(
-              imagePath,
-              width: double.infinity,
-              fit: BoxFit.cover,
-            ),
+            child: isNetworkImage
+                ? Image.network(
+                    imagePath,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => Image.asset(
+                      'assets/images/artisan1.png',
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    ),
+                  )
+                : Image.asset(
+                    imagePath,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  ),
           ),
         ),
         const SizedBox(height: 8),
