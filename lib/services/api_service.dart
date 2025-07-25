@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/event.dart';
+import '../models/story.dart';
 
 class ApiService {
   static const String baseUrl =
@@ -160,6 +161,26 @@ class ApiService {
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
         return data.map((e) => Event.fromJson(e)).toList();
+      } else {
+        return [];
+      }
+    } catch (e) {
+      return [];
+    }
+  }
+
+  // Fetch stories
+  static Future<List<Story>> fetchStories() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/stories'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+        return data.map((e) => Story.fromJson(e)).toList();
       } else {
         return [];
       }

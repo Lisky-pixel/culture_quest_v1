@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/event.dart';
 import '../services/api_service.dart';
+import '../models/story.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -13,11 +14,14 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
   List<Event> _events = [];
   bool _isLoading = true;
+  List<Story> _stories = [];
+  bool _isStoriesLoading = true;
 
   @override
   void initState() {
     super.initState();
     _fetchEvents();
+    _fetchStories();
   }
 
   Future<void> _fetchEvents() async {
@@ -25,6 +29,14 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _events = events;
       _isLoading = false;
+    });
+  }
+
+  Future<void> _fetchStories() async {
+    final stories = await ApiService.fetchStories();
+    setState(() {
+      _stories = stories;
+      _isStoriesLoading = false;
     });
   }
 
@@ -153,29 +165,37 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                const Row(
-                  children: [
-                    Expanded(
-                      child: _StoryCard(
-                        imagePath:
-                            'assets/images/story1.png', // TODO: Replace with actual image
-                        title: 'Tales of the Savannah',
-                        description:
-                            'Discover captivating stories from the heart of Africa.',
-                      ),
-                    ),
-                    SizedBox(width: 16),
-                    Expanded(
-                      child: _StoryCard(
-                        imagePath:
-                            'assets/images/story2.png', // TODO: Replace with actual image
-                        title: 'Legends of the Nile',
-                        description:
-                            'Uncover the ancient myths and legends along the Nile.',
-                      ),
-                    ),
-                  ],
-                ),
+                _isStoriesLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : _stories.isEmpty
+                        ? const Center(child: Text('No stories found'))
+                        : Row(
+                            children: List.generate(
+                                _stories.length > 2 ? 2 : _stories.length,
+                                (index) {
+                              final story = _stories[index];
+                              return Expanded(
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Navigator.pushNamed(
+                                      context,
+                                      '/story_details',
+                                      arguments: story,
+                                    );
+                                  },
+                                  child: _StoryCard(
+                                    imagePath:
+                                        'assets/images/story1.png', // Placeholder
+                                    title: story.title,
+                                    description: story.text.length > 60
+                                        ? story.text.substring(0, 60) + '...'
+                                        : story.text,
+                                  ),
+                                ),
+                              );
+                            })
+                              ..insert(1, const SizedBox(width: 16)),
+                          ),
                 const SizedBox(height: 32),
               ],
             ),

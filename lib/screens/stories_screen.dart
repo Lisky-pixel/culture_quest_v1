@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../models/story.dart';
+import '../services/api_service.dart';
 
 class StoriesScreen extends StatefulWidget {
   const StoriesScreen({Key? key}) : super(key: key);
@@ -9,6 +11,22 @@ class StoriesScreen extends StatefulWidget {
 
 class _StoriesScreenState extends State<StoriesScreen> {
   int _selectedIndex = 2;
+  List<Story> _stories = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchStories();
+  }
+
+  Future<void> _fetchStories() async {
+    final stories = await ApiService.fetchStories();
+    setState(() {
+      _stories = stories;
+      _isLoading = false;
+    });
+  }
 
   void _onItemTapped(int index) {
     switch (index) {
@@ -61,82 +79,37 @@ class _StoriesScreenState extends State<StoriesScreen> {
               ],
             ),
             Expanded(
-              child: ListView(
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(context, '/story_details');
-                    },
-                    child: const _StoryListItem(
-                      imagePath: 'assets/images/golden_stool.png',
-                      title: 'The Golden Stool of',
-                      description:
-                          'Explore the vibrant history of the Ashanti Kingdom, known',
-                      iconType: _StoryIconType.audio,
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(context, '/story_details');
-                    },
-                    child: const _StoryListItem(
-                      imagePath: 'assets/images/adinkra.png',
-                      title: 'Adinkra Cloth: Symbols of',
-                      description:
-                          'Discover the ancient art of Adinkra cloth printing, where',
-                      iconType: _StoryIconType.book,
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(context, '/story_details');
-                    },
-                    child: const _StoryListItem(
-                      imagePath: 'assets/images/anansi.png',
-                      title: 'Anansi the Spider:',
-                      description:
-                          'Listen to the tales of Anansi, the clever spider, a central',
-                      iconType: _StoryIconType.audio,
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(context, '/story_details');
-                    },
-                    child: const _StoryListItem(
-                      imagePath: 'assets/images/kente.png',
-                      title: 'Kente Cloth: Weaving',
-                      description:
-                          'Learn about the significance of Kente cloth, its patterns,',
-                      iconType: _StoryIconType.book,
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(context, '/story_details');
-                    },
-                    child: const _StoryListItem(
-                      imagePath: 'assets/images/highlife.png',
-                      title: 'Highlife Music: Rhythms',
-                      description:
-                          'Immerse yourself in the rhythms of Highlife music, a',
-                      iconType: _StoryIconType.audio,
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(context, '/story_details');
-                    },
-                    child: const _StoryListItem(
-                      imagePath: 'assets/images/festivals.png',
-                      title: 'Festivals of Ghana:',
-                      description:
-                          'Read about the festivals that celebrate the harvest,',
-                      iconType: _StoryIconType.book,
-                    ),
-                  ),
-                ],
-              ),
+              child: _isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : _stories.isEmpty
+                      ? const Center(child: Text('No stories found'))
+                      : ListView.builder(
+                          itemCount: _stories.length,
+                          itemBuilder: (context, index) {
+                            final story = _stories[index];
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.pushNamed(
+                                  context,
+                                  '/story_details',
+                                  arguments: story,
+                                );
+                              },
+                              child: _StoryListItem(
+                                imagePath:
+                                    'assets/images/adire_art.png', // Placeholder
+                                title: story.title,
+                                description: story.text.length > 60
+                                    ? story.text.substring(0, 60) + '...'
+                                    : story.text,
+                                iconType: story.audioUrl != null &&
+                                        story.audioUrl!.isNotEmpty
+                                    ? _StoryIconType.audio
+                                    : _StoryIconType.book,
+                              ),
+                            );
+                          },
+                        ),
             ),
           ],
         ),
