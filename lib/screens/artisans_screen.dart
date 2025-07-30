@@ -111,7 +111,7 @@ class _ArtisansScreenState extends State<ArtisansScreen> {
                         Navigator.pushNamed(context, '/artisan_profile');
                       },
                       child: const _ArtisanCard(
-                        imagePath: 'assets/images/artisan2.png',
+                        imagePath: 'assets/images/Ineza Mutoni.jpg',
                         name: 'Ineza Mutoni',
                       ),
                     ),

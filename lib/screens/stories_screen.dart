@@ -95,7 +95,7 @@ class _StoriesScreenState extends State<StoriesScreen> {
                       imagePath: 'assets/images/anansi.png',
                       title: 'Anansi the Spider:',
                       description:
-                          'Listen to the tales of Anansi, the clever spider, a central',
+                          'Dive into the mischief and magic of Anansi the spider, the cleverest trickster in all the land',
                       iconType: _StoryIconType.audio,
                     ),
                   ),
@@ -104,10 +104,10 @@ class _StoriesScreenState extends State<StoriesScreen> {
                       Navigator.pushNamed(context, '/story_details');
                     },
                     child: const _StoryListItem(
-                      imagePath: 'assets/images/kente.png',
+                      imagePath: 'assets/images/Kente clothing.jpg',
                       title: 'Kente Cloth: Weaving',
                       description:
-                          'Learn about the significance of Kente cloth, its patterns,',
+                          'Explore the rich meaning woven into every thread of Ghanaian Kente ,a cloth of kings, heritage, and pride."',
                       iconType: _StoryIconType.book,
                     ),
                   ),
@@ -128,7 +128,7 @@ class _StoriesScreenState extends State<StoriesScreen> {
                       Navigator.pushNamed(context, '/story_details');
                     },
                     child: const _StoryListItem(
-                      imagePath: 'assets/images/festivals.png',
+                      imagePath: 'assets/images/Ghanian festivals.jpg',
                       title: 'Festivals of Ghana:',
                       description:
                           'Read about the festivals that celebrate the harvest,',
