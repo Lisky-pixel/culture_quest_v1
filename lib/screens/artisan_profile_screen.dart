@@ -39,7 +39,7 @@ class ArtisanProfileScreen extends StatelessWidget {
                 CircleAvatar(
                   radius: 54,
                   backgroundImage: AssetImage(
-                      'assets/images/artisan_profile.png'), // TODO: Replace with actual image
+                      'assets/images/Omar Marmoush.jpg'), // TODO: Replace with actual image
                 ),
                 const SizedBox(height: 20),
                 const Text(
