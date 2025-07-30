@@ -100,7 +100,7 @@ class _StoriesScreenState extends State<StoriesScreen> {
                                     'assets/images/adire_art.png', // Placeholder
                                 title: story.title,
                                 description: story.text.length > 60
-                                    ? story.text.substring(0, 60) + '...'
+                                    ? '${story.text.substring(0, 60)}...'
                                     : story.text,
                                 iconType: story.audioUrl != null &&
                                         story.audioUrl!.isNotEmpty
