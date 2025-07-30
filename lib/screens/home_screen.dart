@@ -132,7 +132,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             'assets/images/story1.png', // TODO: Replace with actual image
                         title: 'Tales of the Savannah',
                         description:
-                            'Discover captivating stories from the heart of Africa.',
+                            'Uncover the magical tale of how one curious zebra earned his bold stripes in the heart of Africa.',
                       ),
                     ),
                     const SizedBox(width: 16),
@@ -142,7 +142,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             'assets/images/story2.png', // TODO: Replace with actual image
                         title: 'Legends of the Nile',
                         description:
-                            'Uncover the ancient myths and legends along the Nile.',
+                            'Dive into the tale of how the sly crocodile became the silent guardian of Africa’s greatest river.',
                       ),
                     ),
                   ],

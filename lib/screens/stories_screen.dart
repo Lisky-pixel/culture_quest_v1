@@ -69,9 +69,9 @@ class _StoriesScreenState extends State<StoriesScreen> {
                     },
                     child: const _StoryListItem(
                       imagePath: 'assets/images/golden_stool.png',
-                      title: 'The Golden Stool of',
+                      title: 'The Golden Stool of the Ashanti',
                       description:
-                          'Explore the vibrant history of the Ashanti Kingdom, known',
+                          'Unveil the legend of the sacred Golden Stool — a symbol of unity, power, and the soul of the Ashanti Kingdom.',
                       iconType: _StoryIconType.audio,
                     ),
                   ),
@@ -80,10 +80,10 @@ class _StoriesScreenState extends State<StoriesScreen> {
                       Navigator.pushNamed(context, '/story_details');
                     },
                     child: const _StoryListItem(
-                      imagePath: 'assets/images/adinkra.png',
-                      title: 'Adinkra Cloth: Symbols of',
+                      imagePath: 'assets/images/Adinkra clothing.png',
+                      title: 'Adinkra Cloth: Language in Symbols',
                       description:
-                          'Discover the ancient art of Adinkra cloth printing, where',
+                          'Uncover the sacred art of Adinkra printing—where every symbol tells a story.',
                       iconType: _StoryIconType.book,
                     ),
                   ),
@@ -92,7 +92,7 @@ class _StoriesScreenState extends State<StoriesScreen> {
                       Navigator.pushNamed(context, '/story_details');
                     },
                     child: const _StoryListItem(
-                      imagePath: 'assets/images/anansi.png',
+                      imagePath: 'assets/images/Anansi the Spider.png',
                       title: 'Anansi the Spider:',
                       description:
                           'Dive into the mischief and magic of Anansi the spider, the cleverest trickster in all the land',
@@ -131,7 +131,7 @@ class _StoriesScreenState extends State<StoriesScreen> {
                       imagePath: 'assets/images/Ghanian festivals.jpg',
                       title: 'Festivals of Ghana:',
                       description:
-                          'Read about the festivals that celebrate the harvest,',
+                          'Uncover the festivals that honor the land, the people, and the past.,',
                       iconType: _StoryIconType.book,
                     ),
                   ),
