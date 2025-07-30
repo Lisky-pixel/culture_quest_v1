@@ -102,8 +102,8 @@ class _ArtisansScreenState extends State<ArtisansScreen> {
                         Navigator.pushNamed(context, '/artisan_profile');
                       },
                       child: const _ArtisanCard(
-                        imagePath: 'assets/images/artisan1.png',
-                        name: 'Kwame Nkrumah',
+                        imagePath: 'assets/images/Omar Marmoush.jpg',
+                        name: 'Omar Marmoush',
                       ),
                     ),
                     GestureDetector(
@@ -120,7 +120,7 @@ class _ArtisansScreenState extends State<ArtisansScreen> {
                         Navigator.pushNamed(context, '/artisan_profile');
                       },
                       child: const _ArtisanCard(
-                        imagePath: 'assets/images/artisan3.png',
+                        imagePath: 'assets/images/Chukwudi Okoro.jpg',
                         name: 'Chukwudi Okoro',
                       ),
                     ),
@@ -129,7 +129,7 @@ class _ArtisansScreenState extends State<ArtisansScreen> {
                         Navigator.pushNamed(context, '/artisan_profile');
                       },
                       child: const _ArtisanCard(
-                        imagePath: 'assets/images/artisan4.png',
+                        imagePath: 'assets/images/Fatima Hassan.jpg',
                         name: 'Fatima Hassan',
                       ),
                     ),
@@ -138,8 +138,8 @@ class _ArtisansScreenState extends State<ArtisansScreen> {
                         Navigator.pushNamed(context, '/artisan_profile');
                       },
                       child: const _ArtisanCard(
-                        imagePath: 'assets/images/artisan5.png',
-                        name: 'Samuel Boateng',
+                        imagePath: 'assets/images/Ishimwe Yves.jpg',
+                        name: 'Ishimwe Yves',
                       ),
                     ),
                     GestureDetector(
@@ -147,7 +147,7 @@ class _ArtisansScreenState extends State<ArtisansScreen> {
                         Navigator.pushNamed(context, '/artisan_profile');
                       },
                       child: const _ArtisanCard(
-                        imagePath: 'assets/images/artisan6.png',
+                        imagePath: 'assets/images/Amina Bello.jpg',
                         name: 'Amina Bello',
                       ),
                     ),
