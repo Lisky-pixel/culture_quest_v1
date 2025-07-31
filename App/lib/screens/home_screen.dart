@@ -222,80 +222,57 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(height: 12),
                   _isStoriesLoading
                       ? const Center(child: CircularProgressIndicator())
-                      : _searchController.text.isNotEmpty
-                          ? Column(
-                              children: _filteredStories.map((story) {
-                                return Padding(
-                                  padding: const EdgeInsets.only(bottom: 12),
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      Navigator.pushNamed(
-                                        context,
-                                        '/story_details',
-                                        arguments: story,
-                                      );
-                                    },
-                                    child: _StoryCard(
-                                      imagePath: story.videoUrl,
-                                      title: story.title,
-                                      description: story.text.length > 60
-                                          ? '${story.text.substring(0, 60)}...'
-                                          : story.text,
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
-                            )
-                          : Row(
-                              children: [
-                                Expanded(
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      Navigator.pushNamed(
-                                        context,
-                                        '/story_details',
-                                        arguments: _filteredStories[0],
-                                      );
-                                    },
-                                    child: _StoryCard(
-                                      imagePath: _filteredStories[0].videoUrl,
-                                      title: _filteredStories[0].title,
-                                      description: _filteredStories[0]
-                                                  .text
-                                                  .length >
-                                              60
-                                          ? '${_filteredStories[0].text.substring(0, 60)}...'
-                                          : _filteredStories[0].text,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 16),
-                                Expanded(
-                                  child: _filteredStories.length > 1
-                                      ? GestureDetector(
-                                          onTap: () {
-                                            Navigator.pushNamed(
-                                              context,
-                                              '/story_details',
-                                              arguments: _filteredStories[1],
-                                            );
-                                          },
-                                          child: _StoryCard(
-                                            imagePath:
-                                                _filteredStories[1].videoUrl,
-                                            title: _filteredStories[1].title,
-                                            description: _filteredStories[1]
-                                                        .text
-                                                        .length >
-                                                    60
-                                                ? '${_filteredStories[1].text.substring(0, 60)}...'
-                                                : _filteredStories[1].text,
-                                          ),
-                                        )
-                                      : Container(), // Empty space if only one story
-                                ),
-                              ],
+                      : Row(
+                          children: [
+                            Expanded(
+                              child: _filteredStories.isNotEmpty
+                                  ? GestureDetector(
+                                      onTap: () {
+                                        Navigator.pushNamed(
+                                          context,
+                                          '/story_details',
+                                          arguments: _filteredStories[0],
+                                        );
+                                      },
+                                      child: _StoryCard(
+                                        imagePath: _filteredStories[0].videoUrl,
+                                        title: _filteredStories[0].title,
+                                        description: _filteredStories[0]
+                                                    .text
+                                                    .length >
+                                                60
+                                            ? '${_filteredStories[0].text.substring(0, 60)}...'
+                                            : _filteredStories[0].text,
+                                      ),
+                                    )
+                                  : Container(),
                             ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: _filteredStories.length > 1
+                                  ? GestureDetector(
+                                      onTap: () {
+                                        Navigator.pushNamed(
+                                          context,
+                                          '/story_details',
+                                          arguments: _filteredStories[1],
+                                        );
+                                      },
+                                      child: _StoryCard(
+                                        imagePath: _filteredStories[1].videoUrl,
+                                        title: _filteredStories[1].title,
+                                        description: _filteredStories[1]
+                                                    .text
+                                                    .length >
+                                                60
+                                            ? '${_filteredStories[1].text.substring(0, 60)}...'
+                                            : _filteredStories[1].text,
+                                      ),
+                                    )
+                                  : Container(),
+                            ),
+                          ],
+                        ),
                 ],
                 const SizedBox(height: 32),
               ],
