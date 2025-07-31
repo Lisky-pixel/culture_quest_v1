@@ -89,10 +89,51 @@ class _ArtisanProfileScreenState extends State<ArtisanProfileScreen> {
                 // Profile image
                 CircleAvatar(
                   radius: 54,
-                  backgroundImage: artisan.gallery.isNotEmpty
-                      ? NetworkImage(artisan.gallery.first.url)
-                      : const AssetImage('assets/images/artisan_profile.png')
-                          as ImageProvider,
+                  backgroundColor: const Color(0xFFF5F1EE),
+                  child: artisan.gallery.isNotEmpty
+                      ? ClipOval(
+                          child: Image.network(
+                            artisan.gallery.first.url,
+                            width: 108,
+                            height: 108,
+                            fit: BoxFit.cover,
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return Container(
+                                width: 108,
+                                height: 108,
+                                color: Colors.grey[200],
+                                child: const Center(
+                                  child: CircularProgressIndicator(),
+                                ),
+                              );
+                            },
+                            errorBuilder: (context, error, stackTrace) {
+                              print(
+                                  'Failed to load profile image: ${artisan.gallery.first.url}, Error: $error');
+                              return Container(
+                                width: 108,
+                                height: 108,
+                                color: Colors.grey[300],
+                                child: const Icon(
+                                  Icons.person,
+                                  size: 50,
+                                  color: Colors.grey,
+                                ),
+                              );
+                            },
+                          ),
+                        )
+                      : Container(
+                          width: 108,
+                          height: 108,
+                          color: Colors.grey[300],
+                          child: const Icon(
+                            Icons.person,
+                            size: 50,
+                            color: Colors.grey,
+                          ),
+                        ),
                 ),
                 const SizedBox(height: 20),
                 Text(
@@ -143,13 +184,36 @@ class _ArtisanProfileScreenState extends State<ArtisanProfileScreen> {
                           width: 70,
                           height: 70,
                           fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) =>
-                              Image.asset(
-                            'assets/images/gallery1.png',
-                            width: 70,
-                            height: 70,
-                            fit: BoxFit.cover,
-                          ),
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return Container(
+                              width: 70,
+                              height: 70,
+                              color: Colors.grey[200],
+                              child: const Center(
+                                child: SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child:
+                                      CircularProgressIndicator(strokeWidth: 2),
+                                ),
+                              ),
+                            );
+                          },
+                          errorBuilder: (context, error, stackTrace) {
+                            print(
+                                'Failed to load gallery image: ${img.url}, Error: $error');
+                            return Container(
+                              width: 70,
+                              height: 70,
+                              color: Colors.grey[300],
+                              child: const Icon(
+                                Icons.image,
+                                size: 30,
+                                color: Colors.grey,
+                              ),
+                            );
+                          },
                         ),
                       );
                     },
@@ -204,19 +268,6 @@ class _ArtisanProfileScreenState extends State<ArtisanProfileScreen> {
           ),
         ),
       ),
-    );
-  }
-}
-
-class _GalleryImage extends StatelessWidget {
-  final String imagePath;
-  const _GalleryImage({required this.imagePath, Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
-      child: Image.asset(imagePath, width: 70, height: 70, fit: BoxFit.cover),
     );
   }
 }
