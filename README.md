@@ -203,7 +203,7 @@ npm run test:cov
 ### Frontend Setup
 ```bash
 # Clone the repository
-git clone  https://github.com/Lisky-pixel/culture_quest_v1
+git clone https://github.com/Lisky-pixel/culture_quest_v1
 cd culture-quest-v1/App
 
 # Install dependencies
