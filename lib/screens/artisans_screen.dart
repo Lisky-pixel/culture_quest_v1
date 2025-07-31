@@ -12,19 +12,46 @@ class ArtisansScreen extends StatefulWidget {
 class _ArtisansScreenState extends State<ArtisansScreen> {
   int _selectedIndex = 3;
   List<Artisan> _artisans = [];
+  List<Artisan> _filteredArtisans = [];
   bool _isLoading = true;
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _fetchArtisans();
+    _searchController.addListener(_filterArtisans);
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   Future<void> _fetchArtisans() async {
     final artisans = await ApiService.fetchArtisans();
     setState(() {
       _artisans = artisans;
+      _filteredArtisans = artisans;
       _isLoading = false;
+    });
+  }
+
+  void _filterArtisans() {
+    final query = _searchController.text.toLowerCase();
+    setState(() {
+      if (query.isEmpty) {
+        _filteredArtisans = _artisans;
+      } else {
+        _filteredArtisans = _artisans.where((artisan) {
+          return artisan.name.toLowerCase().contains(query) ||
+              artisan.profession.toLowerCase().contains(query) ||
+              artisan.city.toLowerCase().contains(query) ||
+              artisan.specialties
+                  .any((specialty) => specialty.toLowerCase().contains(query));
+        }).toList();
+      }
     });
   }
 
@@ -88,20 +115,32 @@ class _ArtisansScreenState extends State<ArtisansScreen> {
                 ),
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: const Row(
+                child: Row(
                   children: [
-                    Icon(Icons.search, color: Colors.black45),
-                    SizedBox(width: 8),
+                    const Icon(Icons.search, color: Colors.black45),
+                    const SizedBox(width: 8),
                     Expanded(
                       child: TextField(
-                        decoration: InputDecoration(
-                          hintText: 'Search',
+                        controller: _searchController,
+                        decoration: const InputDecoration(
+                          hintText: 'Search artisans...',
                           border: InputBorder.none,
                           isDense: true,
                         ),
-                        style: TextStyle(fontSize: 16),
+                        style: const TextStyle(fontSize: 16),
                       ),
                     ),
+                    if (_searchController.text.isNotEmpty)
+                      GestureDetector(
+                        onTap: () {
+                          _searchController.clear();
+                        },
+                        child: const Icon(
+                          Icons.clear,
+                          color: Colors.black45,
+                          size: 20,
+                        ),
+                      ),
                   ],
                 ),
               ),
@@ -111,16 +150,24 @@ class _ArtisansScreenState extends State<ArtisansScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 12.0),
                 child: _isLoading
                     ? const Center(child: CircularProgressIndicator())
-                    : _artisans.isEmpty
-                        ? const Center(child: Text('No artisans found'))
+                    : _filteredArtisans.isEmpty
+                        ? Center(
+                            child: Text(
+                              _searchController.text.isNotEmpty
+                                  ? 'No artisans found matching "${_searchController.text}"'
+                                  : 'No artisans found',
+                              textAlign: TextAlign.center,
+                            ),
+                          )
                         : GridView.count(
                             crossAxisCount: 2,
                             crossAxisSpacing: 16,
                             mainAxisSpacing: 16,
                             childAspectRatio:
                                 0.75, // Make cards taller for bigger images
-                            children: List.generate(_artisans.length, (index) {
-                              final artisan = _artisans[index];
+                            children: List.generate(_filteredArtisans.length,
+                                (index) {
+                              final artisan = _filteredArtisans[index];
                               return GestureDetector(
                                 onTap: () {
                                   Navigator.pushNamed(
@@ -203,16 +250,48 @@ class _ArtisanCard extends StatelessWidget {
                     imagePath,
                     width: double.infinity,
                     fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Image.asset(
-                      'assets/images/artisan1.png',
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                    ),
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Container(
+                        color: Colors.grey[200],
+                        child: const Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      );
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      print('Failed to load image: $imagePath, Error: $error');
+                      return Container(
+                        color: Colors.grey[200],
+                        child: Image.asset(
+                          'assets/images/artisan1.png',
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) =>
+                              Container(
+                            color: Colors.grey[300],
+                            child: const Icon(
+                              Icons.person,
+                              size: 50,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
                   )
                 : Image.asset(
                     imagePath,
                     width: double.infinity,
                     fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => Container(
+                      color: Colors.grey[300],
+                      child: const Icon(
+                        Icons.person,
+                        size: 50,
+                        color: Colors.grey,
+                      ),
+                    ),
                   ),
           ),
         ),
