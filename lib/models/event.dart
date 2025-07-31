@@ -28,7 +28,7 @@ class Event {
     required this.description,
     required this.venue,
     required this.address,
-    this.coordinates,
+    required this.coordinates,
     required this.accessInstructions,
     required this.startDate,
     required this.endDate,
