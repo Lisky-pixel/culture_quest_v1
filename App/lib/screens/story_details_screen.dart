@@ -65,13 +65,57 @@ class StoryDetailsScreen extends StatelessWidget {
             ),
             Container(
               width: double.infinity,
-              color: const Color(0xFFF7EFE7),
               child: AspectRatio(
                 aspectRatio: 1.2,
-                child: Image.asset(
-                  'assets/images/adire_art.png', // Placeholder
-                  fit: BoxFit.cover,
-                ),
+                child: story.imageUrl != null && story.imageUrl!.isNotEmpty
+                    ? Image.network(
+                        story.imageUrl!,
+                        fit: BoxFit.cover,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  Colors.orange.shade100,
+                                  Colors.pink.shade100,
+                                ],
+                              ),
+                            ),
+                            child: const Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                          );
+                        },
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  Colors.orange.shade100,
+                                  Colors.pink.shade100,
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      )
+                    : Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              Colors.orange.shade100,
+                              Colors.pink.shade100,
+                            ],
+                          ),
+                        ),
+                      ),
               ),
             ),
             Expanded(
@@ -93,7 +137,7 @@ class StoryDetailsScreen extends StatelessWidget {
                       Text(
                         story.text,
                         style: const TextStyle(
-                          fontSize: 15,
+                          fontSize: 16,
                           color: Colors.black87,
                         ),
                       ),
@@ -109,12 +153,45 @@ class StoryDetailsScreen extends StatelessWidget {
                             children: [
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(8),
-                                child: Image.asset(
-                                  'assets/images/adire_art.png',
-                                  width: 40,
-                                  height: 40,
-                                  fit: BoxFit.cover,
-                                ),
+                                child: story.imageUrl != null &&
+                                        story.imageUrl!.isNotEmpty
+                                    ? Image.network(
+                                        story.imageUrl!,
+                                        width: 40,
+                                        height: 40,
+                                        fit: BoxFit.cover,
+                                        errorBuilder:
+                                            (context, error, stackTrace) {
+                                          return Container(
+                                            width: 40,
+                                            height: 40,
+                                            decoration: BoxDecoration(
+                                              gradient: LinearGradient(
+                                                begin: Alignment.topLeft,
+                                                end: Alignment.bottomRight,
+                                                colors: [
+                                                  Colors.orange.shade100,
+                                                  Colors.pink.shade100,
+                                                ],
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      )
+                                    : Container(
+                                        width: 40,
+                                        height: 40,
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            begin: Alignment.topLeft,
+                                            end: Alignment.bottomRight,
+                                            colors: [
+                                              Colors.orange.shade100,
+                                              Colors.pink.shade100,
+                                            ],
+                                          ),
+                                        ),
+                                      ),
                               ),
                               const SizedBox(width: 12),
                               Expanded(
@@ -125,7 +202,7 @@ class StoryDetailsScreen extends StatelessWidget {
                                       story.title,
                                       style: const TextStyle(
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 15,
+                                        fontSize: 16,
                                       ),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
@@ -134,7 +211,7 @@ class StoryDetailsScreen extends StatelessWidget {
                                     Text(
                                       story.narrator?.name ?? 'CultureQuest',
                                       style: const TextStyle(
-                                        fontSize: 13,
+                                        fontSize: 14,
                                         color: Colors.black54,
                                       ),
                                     ),

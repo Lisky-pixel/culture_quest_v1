@@ -3,6 +3,7 @@ class Story {
   final String title;
   final String type;
   final String text;
+  final String? imageUrl;
   final String? audioUrl;
   final String? videoUrl;
   final String? transcription;
@@ -30,6 +31,7 @@ class Story {
     required this.title,
     required this.type,
     required this.text,
+    this.imageUrl,
     this.audioUrl,
     this.videoUrl,
     this.transcription,
@@ -59,6 +61,7 @@ class Story {
       title: json['title'] ?? '',
       type: json['type'] ?? '',
       text: json['text'] ?? '',
+      imageUrl: json['imageUrl'],
       audioUrl: json['audioUrl'],
       videoUrl: json['videoUrl'],
       transcription: json['transcription'],
