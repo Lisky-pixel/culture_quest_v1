@@ -1,10 +1,61 @@
 import 'package:flutter/material.dart';
+import '../models/artisan.dart';
+import '../services/api_service.dart';
 
-class ArtisanProfileScreen extends StatelessWidget {
+class ArtisanProfileScreen extends StatefulWidget {
   const ArtisanProfileScreen({Key? key}) : super(key: key);
 
   @override
+  State<ArtisanProfileScreen> createState() => _ArtisanProfileScreenState();
+}
+
+class _ArtisanProfileScreenState extends State<ArtisanProfileScreen> {
+  Artisan? _artisan;
+  bool _isLoading = true;
+  bool _hasError = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final arg = ModalRoute.of(context)?.settings.arguments;
+    if (arg is Artisan) {
+      _fetchArtisan(arg.id);
+    } else if (arg is String) {
+      _fetchArtisan(arg);
+    } else {
+      setState(() {
+        _hasError = true;
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _fetchArtisan(String id) async {
+    setState(() {
+      _isLoading = true;
+      _hasError = false;
+    });
+    final artisan = await ApiService.fetchArtisanById(id);
+    setState(() {
+      _artisan = artisan;
+      _isLoading = false;
+      _hasError = artisan == null;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+    if (_hasError || _artisan == null) {
+      return const Scaffold(
+        body: Center(child: Text('Failed to load artisan profile.')),
+      );
+    }
+    final artisan = _artisan!;
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -38,39 +89,73 @@ class ArtisanProfileScreen extends StatelessWidget {
                 // Profile image
                 CircleAvatar(
                   radius: 54,
-                  backgroundImage: AssetImage(
-                      'assets/images/Omar Marmoush.jpg'), // TODO: Replace with actual image
+                  backgroundColor: const Color(0xFFF5F1EE),
+                  child: artisan.gallery.isNotEmpty
+                      ? ClipOval(
+                          child: Image.network(
+                            artisan.gallery.first.url,
+                            width: 108,
+                            height: 108,
+                            fit: BoxFit.cover,
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return Container(
+                                width: 108,
+                                height: 108,
+                                color: Colors.grey[200],
+                                child: const Center(
+                                  child: CircularProgressIndicator(),
+                                ),
+                              );
+                            },
+                            errorBuilder: (context, error, stackTrace) {
+                              print(
+                                  'Failed to load profile image: ${artisan.gallery.first.url}, Error: $error');
+                              return Container(
+                                width: 108,
+                                height: 108,
+                                color: Colors.grey[300],
+                                child: const Icon(
+                                  Icons.person,
+                                  size: 50,
+                                  color: Colors.grey,
+                                ),
+                              );
+                            },
+                          ),
+                        )
+                      : Container(
+                          width: 108,
+                          height: 108,
+                          color: Colors.grey[300],
+                          child: const Icon(
+                            Icons.person,
+                            size: 50,
+                            color: Colors.grey,
+                          ),
+                        ),
                 ),
                 const SizedBox(height: 20),
-                const Text(
-                  'Omar Marmoush',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 22,
-                  ),
+                Text(
+                  artisan.name,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 22),
                 ),
                 const SizedBox(height: 4),
-                const Text(
-                  'Traditional Weaver',
-                  style: TextStyle(
-                    color: Color(0xFFB49A87),
-                    fontSize: 16,
-                  ),
+                Text(
+                  artisan.profession,
+                  style:
+                      const TextStyle(color: Color(0xFFB49A87), fontSize: 16),
                 ),
-                const Text(
-                  'Marrakesh, Morocco',
-                  style: TextStyle(
-                    color: Color(0xFFB49A87),
-                    fontSize: 15,
-                  ),
+                Text(
+                  artisan.city,
+                  style:
+                      const TextStyle(color: Color(0xFFB49A87), fontSize: 15),
                 ),
                 const SizedBox(height: 16),
-                const Text(
-                  'Omar Marmoush is a master weaver from Marrakesh, Morocco, known for his intricate designs and use of natural dyes. His work reflects the rich cultural heritage of the Moroccan people, blending traditional techniques with contemporary aesthetics.',
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: Colors.black87,
-                  ),
+                Text(
+                  artisan.description,
+                  style: const TextStyle(fontSize: 15, color: Colors.black87),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 24),
@@ -79,24 +164,59 @@ class ArtisanProfileScreen extends StatelessWidget {
                   alignment: Alignment.centerLeft,
                   child: Text(
                     'Gallery',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                 ),
                 const SizedBox(height: 10),
                 SizedBox(
                   height: 70,
-                  child: ListView(
+                  child: ListView.separated(
                     scrollDirection: Axis.horizontal,
-                    children: [
-                      _GalleryImage(imagePath: 'assets/images/gallery1.png'),
-                      const SizedBox(width: 12),
-                      _GalleryImage(imagePath: 'assets/images/gallery2.png'),
-                      const SizedBox(width: 12),
-                      _GalleryImage(imagePath: 'assets/images/gallery3.png'),
-                    ],
+                    itemCount: artisan.gallery.length,
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(width: 12),
+                    itemBuilder: (context, index) {
+                      final img = artisan.gallery[index];
+                      return ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.network(
+                          img.url,
+                          width: 70,
+                          height: 70,
+                          fit: BoxFit.cover,
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return Container(
+                              width: 70,
+                              height: 70,
+                              color: Colors.grey[200],
+                              child: const Center(
+                                child: SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child:
+                                      CircularProgressIndicator(strokeWidth: 2),
+                                ),
+                              ),
+                            );
+                          },
+                          errorBuilder: (context, error, stackTrace) {
+                            print(
+                                'Failed to load gallery image: ${img.url}, Error: $error');
+                            return Container(
+                              width: 70,
+                              height: 70,
+                              color: Colors.grey[300],
+                              child: const Icon(
+                                Icons.image,
+                                size: 30,
+                                color: Colors.grey,
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                    },
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -105,21 +225,19 @@ class ArtisanProfileScreen extends StatelessWidget {
                   alignment: Alignment.centerLeft,
                   child: Text(
                     'Specialties',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                 ),
                 const SizedBox(height: 10),
-                Wrap(
-                  spacing: 10,
-                  runSpacing: 8,
-                  children: const [
-                    _SpecialtyChip(label: 'Textile Art'),
-                    _SpecialtyChip(label: 'Natural Dyes'),
-                    _SpecialtyChip(label: 'Yoruba Weaving'),
-                  ],
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Wrap(
+                    spacing: 10,
+                    runSpacing: 8,
+                    children: artisan.specialties
+                        .map((label) => _SpecialtyChip(label: label))
+                        .toList(),
+                  ),
                 ),
                 const SizedBox(height: 32),
                 SizedBox(
@@ -154,24 +272,6 @@ class ArtisanProfileScreen extends StatelessWidget {
   }
 }
 
-class _GalleryImage extends StatelessWidget {
-  final String imagePath;
-  const _GalleryImage({required this.imagePath, Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
-      child: Image.asset(
-        imagePath,
-        width: 70,
-        height: 70,
-        fit: BoxFit.cover,
-      ),
-    );
-  }
-}
-
 class _SpecialtyChip extends StatelessWidget {
   final String label;
   const _SpecialtyChip({required this.label, Key? key}) : super(key: key);
@@ -186,10 +286,7 @@ class _SpecialtyChip extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: const TextStyle(
-          color: Colors.black87,
-          fontSize: 14,
-        ),
+        style: const TextStyle(color: Colors.black87, fontSize: 14),
       ),
     );
   }

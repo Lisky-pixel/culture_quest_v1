@@ -72,17 +72,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     style:
                         TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                 const SizedBox(height: 12),
-                Row(
+                const Row(
                   children: [
-                    const CircleAvatar(
+                    CircleAvatar(
                       radius: 28,
                       backgroundImage: AssetImage(
                           'assets/images/profile_avatar.png'), // TODO: Replace with actual image
                     ),
-                    const SizedBox(width: 12),
+                    SizedBox(width: 12),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
+                      children: [
                         Text('Aisha Kamara',
                             style: TextStyle(
                                 fontWeight: FontWeight.bold, fontSize: 16)),

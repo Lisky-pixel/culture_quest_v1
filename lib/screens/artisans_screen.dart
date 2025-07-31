@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../models/artisan.dart';
+import '../services/api_service.dart';
 
 class ArtisansScreen extends StatefulWidget {
   const ArtisansScreen({Key? key}) : super(key: key);
@@ -9,6 +11,49 @@ class ArtisansScreen extends StatefulWidget {
 
 class _ArtisansScreenState extends State<ArtisansScreen> {
   int _selectedIndex = 3;
+  List<Artisan> _artisans = [];
+  List<Artisan> _filteredArtisans = [];
+  bool _isLoading = true;
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchArtisans();
+    _searchController.addListener(_filterArtisans);
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _fetchArtisans() async {
+    final artisans = await ApiService.fetchArtisans();
+    setState(() {
+      _artisans = artisans;
+      _filteredArtisans = artisans;
+      _isLoading = false;
+    });
+  }
+
+  void _filterArtisans() {
+    final query = _searchController.text.toLowerCase();
+    setState(() {
+      if (query.isEmpty) {
+        _filteredArtisans = _artisans;
+      } else {
+        _filteredArtisans = _artisans.where((artisan) {
+          return artisan.name.toLowerCase().contains(query) ||
+              artisan.profession.toLowerCase().contains(query) ||
+              artisan.city.toLowerCase().contains(query) ||
+              artisan.specialties
+                  .any((specialty) => specialty.toLowerCase().contains(query));
+        }).toList();
+      }
+    });
+  }
 
   void _onItemTapped(int index) {
     switch (index) {
@@ -71,19 +116,31 @@ class _ArtisansScreenState extends State<ArtisansScreen> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Row(
-                  children: const [
-                    Icon(Icons.search, color: Colors.black45),
-                    SizedBox(width: 8),
+                  children: [
+                    const Icon(Icons.search, color: Colors.black45),
+                    const SizedBox(width: 8),
                     Expanded(
                       child: TextField(
-                        decoration: InputDecoration(
-                          hintText: 'Search',
+                        controller: _searchController,
+                        decoration: const InputDecoration(
+                          hintText: 'Search artisans...',
                           border: InputBorder.none,
                           isDense: true,
                         ),
-                        style: TextStyle(fontSize: 16),
+                        style: const TextStyle(fontSize: 16),
                       ),
                     ),
+                    if (_searchController.text.isNotEmpty)
+                      GestureDetector(
+                        onTap: () {
+                          _searchController.clear();
+                        },
+                        child: const Icon(
+                          Icons.clear,
+                          color: Colors.black45,
+                          size: 20,
+                        ),
+                      ),
                   ],
                 ),
               ),
@@ -91,68 +148,44 @@ class _ArtisansScreenState extends State<ArtisansScreen> {
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                child: GridView.count(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
-                  childAspectRatio: 0.75, // Make cards taller for bigger images
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pushNamed(context, '/artisan_profile');
-                      },
-                      child: const _ArtisanCard(
-                        imagePath: 'assets/images/Omar Marmoush.jpg',
-                        name: 'Omar Marmoush',
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pushNamed(context, '/artisan_profile');
-                      },
-                      child: const _ArtisanCard(
-                        imagePath: 'assets/images/Ineza Mutoni.jpg',
-                        name: 'Ineza Mutoni',
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pushNamed(context, '/artisan_profile');
-                      },
-                      child: const _ArtisanCard(
-                        imagePath: 'assets/images/Chukwudi Okoro.jpg',
-                        name: 'Chukwudi Okoro',
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pushNamed(context, '/artisan_profile');
-                      },
-                      child: const _ArtisanCard(
-                        imagePath: 'assets/images/Fatima Hassan.jpg',
-                        name: 'Fatima Hassan',
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pushNamed(context, '/artisan_profile');
-                      },
-                      child: const _ArtisanCard(
-                        imagePath: 'assets/images/Ishimwe Yves.jpg',
-                        name: 'Ishimwe Yves',
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pushNamed(context, '/artisan_profile');
-                      },
-                      child: const _ArtisanCard(
-                        imagePath: 'assets/images/Amina Bello.jpg',
-                        name: 'Amina Bello',
-                      ),
-                    ),
-                  ],
-                ),
+                child: _isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : _filteredArtisans.isEmpty
+                        ? Center(
+                            child: Text(
+                              _searchController.text.isNotEmpty
+                                  ? 'No artisans found matching "${_searchController.text}"'
+                                  : 'No artisans found',
+                              textAlign: TextAlign.center,
+                            ),
+                          )
+                        : GridView.count(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 16,
+                            mainAxisSpacing: 16,
+                            childAspectRatio:
+                                0.75, // Make cards taller for bigger images
+                            children: List.generate(_filteredArtisans.length,
+                                (index) {
+                              final artisan = _filteredArtisans[index];
+                              return GestureDetector(
+                                onTap: () {
+                                  Navigator.pushNamed(
+                                    context,
+                                    '/artisan_profile',
+                                    arguments: artisan,
+                                  );
+                                },
+                                child: _ArtisanCard(
+                                  imagePath: artisan.gallery.isNotEmpty
+                                      ? artisan.gallery.first.url
+                                      : 'assets/images/artisan1.png',
+                                  isNetworkImage: artisan.gallery.isNotEmpty,
+                                  name: artisan.name,
+                                ),
+                              );
+                            }),
+                          ),
               ),
             ),
           ],
@@ -195,7 +228,12 @@ class _ArtisansScreenState extends State<ArtisansScreen> {
 class _ArtisanCard extends StatelessWidget {
   final String imagePath;
   final String name;
-  const _ArtisanCard({required this.imagePath, required this.name, Key? key})
+  final bool isNetworkImage;
+  const _ArtisanCard(
+      {required this.imagePath,
+      required this.name,
+      this.isNetworkImage = false,
+      Key? key})
       : super(key: key);
 
   @override
@@ -207,11 +245,54 @@ class _ArtisanCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           child: AspectRatio(
             aspectRatio: 1,
-            child: Image.asset(
-              imagePath,
-              width: double.infinity,
-              fit: BoxFit.cover,
-            ),
+            child: isNetworkImage
+                ? Image.network(
+                    imagePath,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Container(
+                        color: Colors.grey[200],
+                        child: const Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      );
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      print('Failed to load image: $imagePath, Error: $error');
+                      return Container(
+                        color: Colors.grey[200],
+                        child: Image.asset(
+                          'assets/images/artisan1.png',
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) =>
+                              Container(
+                            color: Colors.grey[300],
+                            child: const Icon(
+                              Icons.person,
+                              size: 50,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  )
+                : Image.asset(
+                    imagePath,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => Container(
+                      color: Colors.grey[300],
+                      child: const Icon(
+                        Icons.person,
+                        size: 50,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
           ),
         ),
         const SizedBox(height: 8),

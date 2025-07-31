@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../models/story.dart';
+import '../services/api_service.dart';
 
 class StoriesScreen extends StatefulWidget {
   const StoriesScreen({Key? key}) : super(key: key);
@@ -9,6 +11,22 @@ class StoriesScreen extends StatefulWidget {
 
 class _StoriesScreenState extends State<StoriesScreen> {
   int _selectedIndex = 2;
+  List<Story> _stories = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchStories();
+  }
+
+  Future<void> _fetchStories() async {
+    final stories = await ApiService.fetchStories();
+    setState(() {
+      _stories = stories;
+      _isLoading = false;
+    });
+  }
 
   void _onItemTapped(int index) {
     switch (index) {
@@ -61,82 +79,37 @@ class _StoriesScreenState extends State<StoriesScreen> {
               ],
             ),
             Expanded(
-              child: ListView(
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(context, '/story_details');
-                    },
-                    child: const _StoryListItem(
-                      imagePath: 'assets/images/golden_stool.png',
-                      title: 'The Golden Stool of the Ashanti',
-                      description:
-                          'Unveil the legend of the sacred Golden Stool — a symbol of unity, power, and the soul of the Ashanti Kingdom.',
-                      iconType: _StoryIconType.audio,
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(context, '/story_details');
-                    },
-                    child: const _StoryListItem(
-                      imagePath: 'assets/images/Adinkra clothing.png',
-                      title: 'Adinkra Cloth: Language in Symbols',
-                      description:
-                          'Uncover the sacred art of Adinkra printing—where every symbol tells a story.',
-                      iconType: _StoryIconType.book,
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(context, '/story_details');
-                    },
-                    child: const _StoryListItem(
-                      imagePath: 'assets/images/Anansi the Spider.png',
-                      title: 'Anansi the Spider:',
-                      description:
-                          'Dive into the mischief and magic of Anansi the spider, the cleverest trickster in all the land',
-                      iconType: _StoryIconType.audio,
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(context, '/story_details');
-                    },
-                    child: const _StoryListItem(
-                      imagePath: 'assets/images/Kente clothing.jpg',
-                      title: 'Kente Cloth: Weaving',
-                      description:
-                          'Explore the rich meaning woven into every thread of Ghanaian Kente ,a cloth of kings, heritage, and pride."',
-                      iconType: _StoryIconType.book,
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(context, '/story_details');
-                    },
-                    child: const _StoryListItem(
-                      imagePath: 'assets/images/highlife.png',
-                      title: 'Highlife Music: Rhythms',
-                      description:
-                          'Immerse yourself in the rhythms of Highlife music, a',
-                      iconType: _StoryIconType.audio,
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(context, '/story_details');
-                    },
-                    child: const _StoryListItem(
-                      imagePath: 'assets/images/Ghanian festivals.jpg',
-                      title: 'Festivals of Ghana:',
-                      description:
-                          'Uncover the festivals that honor the land, the people, and the past.,',
-                      iconType: _StoryIconType.book,
-                    ),
-                  ),
-                ],
-              ),
+              child: _isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : _stories.isEmpty
+                      ? const Center(child: Text('No stories found'))
+                      : ListView.builder(
+                          itemCount: _stories.length,
+                          itemBuilder: (context, index) {
+                            final story = _stories[index];
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.pushNamed(
+                                  context,
+                                  '/story_details',
+                                  arguments: story,
+                                );
+                              },
+                              child: _StoryListItem(
+                                imagePath:
+                                    'assets/images/adire_art.png', // Placeholder
+                                title: story.title,
+                                description: story.text.length > 60
+                                    ? '${story.text.substring(0, 60)}...'
+                                    : story.text,
+                                iconType: story.audioUrl != null &&
+                                        story.audioUrl!.isNotEmpty
+                                    ? _StoryIconType.audio
+                                    : _StoryIconType.book,
+                              ),
+                            );
+                          },
+                        ),
             ),
           ],
         ),

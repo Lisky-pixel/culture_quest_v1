@@ -1,7 +1,28 @@
 import 'package:flutter/material.dart';
+import '../services/api_service.dart';
 
-class WelcomeScreen extends StatelessWidget {
+class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({Key? key}) : super(key: key);
+
+  @override
+  State<WelcomeScreen> createState() => _WelcomeScreenState();
+}
+
+class _WelcomeScreenState extends State<WelcomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    _checkAuthStatus();
+  }
+
+  Future<void> _checkAuthStatus() async {
+    // Check if user is already logged in
+    final isLoggedIn = await ApiService.isLoggedIn();
+    if (isLoggedIn && mounted) {
+      // Navigate to home if already logged in
+      Navigator.pushReplacementNamed(context, '/home');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,14 +39,20 @@ class WelcomeScreen extends StatelessWidget {
                   // Logo and background
                   Container(
                     width: double.infinity,
-                    color: const Color(0xFFF7EFE7),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFF7EFE7),
+                      borderRadius: BorderRadius.all(Radius.circular(16)),
+                    ),
                     child: Column(
                       children: [
                         AspectRatio(
                           aspectRatio: 1.6, // Adjust as needed for your design
-                          child: Image.asset(
-                            'assets/images/CQ_Logo.png',
-                            fit: BoxFit.cover,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(16),
+                            child: Image.asset(
+                              'assets/images/CQ_Logo.png',
+                              fit: BoxFit.cover,
+                            ),
                           ),
                         ),
                       ],
@@ -47,20 +74,23 @@ class WelcomeScreen extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.black87,
+                      height: 1.5,
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 40),
+                  // Login Button
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFF7EFE7),
-                        foregroundColor: Colors.black,
+                        backgroundColor: const Color(0xFFF1872D),
+                        foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(24),
                         ),
-                        elevation: 0,
+                        elevation: 2,
+                        shadowColor: const Color(0xFFF1872D).withOpacity(0.3),
                         padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
                       onPressed: () {
@@ -74,14 +104,19 @@ class WelcomeScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
+                  // Sign Up Button
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFF3F3F3),
+                        backgroundColor: const Color(0xFFF7EFE7),
                         foregroundColor: Colors.black,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(24),
+                          side: const BorderSide(
+                            color: Color(0xFFF1872D),
+                            width: 1.5,
+                          ),
                         ),
                         elevation: 0,
                         padding: const EdgeInsets.symmetric(vertical: 16),
@@ -97,11 +132,31 @@ class WelcomeScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 32),
+                  // Continue as Guest option
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/home');
+                    },
+                    style: TextButton.styleFrom(
+                      foregroundColor: const Color(0xFFB49A87),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    child: const Text(
+                      'Continue as Guest',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
                   const Text(
                     'By continuing, you agree to our Terms of Service and Privacy Policy.',
                     style: TextStyle(
                       fontSize: 12,
                       color: Colors.black45,
+                      height: 1.4,
                     ),
                     textAlign: TextAlign.center,
                   ),
