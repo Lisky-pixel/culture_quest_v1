@@ -236,7 +236,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       );
                                     },
                                     child: _StoryCard(
-                                      imagePath: null,
+                                      imagePath: story.videoUrl,
                                       title: story.title,
                                       description: story.text.length > 60
                                           ? '${story.text.substring(0, 60)}...'
@@ -258,7 +258,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       );
                                     },
                                     child: _StoryCard(
-                                      imagePath: null,
+                                      imagePath: _filteredStories[0].videoUrl,
                                       title: _filteredStories[0].title,
                                       description: _filteredStories[0]
                                                   .text
@@ -281,7 +281,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                             );
                                           },
                                           child: _StoryCard(
-                                            imagePath: null,
+                                            imagePath:
+                                                _filteredStories[1].videoUrl,
                                             title: _filteredStories[1].title,
                                             description: _filteredStories[1]
                                                         .text
@@ -346,7 +347,7 @@ class _EventCard extends StatelessWidget {
     this.imagePath,
     required this.title,
     required this.description,
-    this.isNetworkImage = false,
+    this.isNetworkImage = true,
     Key? key,
   }) : super(key: key);
 
@@ -507,24 +508,36 @@ class _StoryCard extends StatelessWidget {
               topRight: Radius.circular(16),
             ),
             child: imagePath != null
-                ? Image.asset(
+                ? Image.network(
                     imagePath!,
                     height: 100,
                     width: double.infinity,
                     fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Container(
-                      height: 100,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            Colors.orange.shade100,
-                            Colors.pink.shade100,
-                          ],
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Container(
+                        height: 100,
+                        color: Colors.grey[200],
+                        child: const Center(
+                          child: CircularProgressIndicator(),
                         ),
-                      ),
-                    ),
+                      );
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        height: 100,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              Colors.orange.shade100,
+                              Colors.pink.shade100,
+                            ],
+                          ),
+                        ),
+                      );
+                    },
                   )
                 : Container(
                     height: 100,
