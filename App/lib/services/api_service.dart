@@ -28,9 +28,9 @@ class ApiService {
 
       if (response.statusCode == 201) {
         // Save token to SharedPreferences
-        if (responseData['token'] != null) {
+        if (responseData['access_token'] != null) {
           final prefs = await SharedPreferences.getInstance();
-          await prefs.setString('auth_token', responseData['token']);
+          await prefs.setString('auth_token', responseData['access_token']);
           await prefs.setString('user_data', jsonEncode(responseData['user']));
         }
         return {
@@ -107,6 +107,16 @@ class ApiService {
   static Future<bool> isLoggedIn() async {
     final token = await getAuthToken();
     return token != null && token.isNotEmpty;
+  }
+
+  // Get stored user data
+  static Future<Map<String, dynamic>?> getUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userDataString = prefs.getString('user_data');
+    if (userDataString != null) {
+      return jsonDecode(userDataString);
+    }
+    return null;
   }
 
   // Logout user
@@ -191,7 +201,8 @@ class ApiService {
   }
 
   // Fetch events by date range
-  static Future<List<Event>> fetchEventsByDateRange(DateTime fromDate, DateTime toDate) async {
+  static Future<List<Event>> fetchEventsByDateRange(
+      DateTime fromDate, DateTime toDate) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/events/date-range'),
@@ -215,10 +226,13 @@ class ApiService {
   }
 
   // Fetch nearby events
-  static Future<List<Event>> fetchNearbyEvents(double latitude, double longitude, {double radius = 10.0}) async {
+  static Future<List<Event>> fetchNearbyEvents(
+      double latitude, double longitude,
+      {double radius = 10.0}) async {
     try {
       final response = await http.get(
-        Uri.parse('$baseUrl/events/search/nearby?lat=$latitude&lng=$longitude&radius=$radius'),
+        Uri.parse(
+            '$baseUrl/events/search/nearby?lat=$latitude&lng=$longitude&radius=$radius'),
         headers: {
           'Content-Type': 'application/json',
         },

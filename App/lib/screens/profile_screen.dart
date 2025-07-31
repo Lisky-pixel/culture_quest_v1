@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/api_service.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -9,6 +10,8 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   int _selectedIndex = 4;
+  Map<String, dynamic>? _userData;
+  bool _isLoading = true;
 
   void _onItemTapped(int index) {
     switch (index) {
@@ -35,6 +38,70 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   bool _privateAccount = false;
   bool _shareData = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    try {
+      final userData = await ApiService.getUserData();
+      print('User Data: $userData');
+      setState(() {
+        _userData = userData;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  String _getInitials(String name) {
+    List<String> names = name.split(' ');
+    String initials = '';
+    for (int i = 0; i < names.length && i < 2; i++) {
+      if (names[i].isNotEmpty) {
+        initials += names[i][0].toUpperCase();
+      }
+    }
+    return initials.isEmpty ? 'U' : initials;
+  }
+
+  Future<void> _handleLogout() async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Logout'),
+          content: const Text('Are you sure you want to logout?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await ApiService.logout();
+                if (mounted) {
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    '/login',
+                    (route) => false,
+                  );
+                }
+              },
+              child: const Text('Logout', style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,27 +139,63 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     style:
                         TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                 const SizedBox(height: 12),
-                const Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 28,
-                      backgroundImage: AssetImage(
-                          'assets/images/profile_avatar.png'), // TODO: Replace with actual image
-                    ),
-                    SizedBox(width: 12),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Aisha Kamara',
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 16)),
-                        Text('Aisha.K@example.com',
-                            style: TextStyle(
-                                color: Color(0xFFB49A87), fontSize: 14)),
-                      ],
-                    ),
-                  ],
-                ),
+                _isLoading
+                    ? const Center(
+                        child: CircularProgressIndicator(),
+                      )
+                    : Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 28,
+                            backgroundColor: const Color(0xFFB49A87),
+                            child: _userData?['profileImage'] != null
+                                ? ClipOval(
+                                    child: Image.network(
+                                      _userData!['profileImage'],
+                                      width: 56,
+                                      height: 56,
+                                      fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                        return Text(
+                                          _getInitials(
+                                              _userData?['name'] ?? 'User'),
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  )
+                                : Text(
+                                    _getInitials(_userData?['name'] ?? 'User'),
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                          ),
+                          const SizedBox(width: 12),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                _userData?['name'] ?? 'User Name',
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 16),
+                              ),
+                              Text(
+                                _userData?['email'] ?? 'user@example.com',
+                                style: const TextStyle(
+                                    color: Color(0xFFB49A87), fontSize: 14),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                 const SizedBox(height: 12),
                 ListTile(
                   contentPadding: EdgeInsets.zero,
@@ -172,6 +275,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   title: const Text('Privacy Policy'),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () {},
+                ),
+                const SizedBox(height: 16),
+                const Text('Account Actions',
+                    style:
+                        TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                const SizedBox(height: 8),
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(Icons.logout, color: Colors.red),
+                  title:
+                      const Text('Logout', style: TextStyle(color: Colors.red)),
+                  onTap: _handleLogout,
                 ),
                 const SizedBox(height: 24),
               ],

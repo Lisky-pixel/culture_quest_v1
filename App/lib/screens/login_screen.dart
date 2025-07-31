@@ -49,7 +49,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (result['success']) {
         _showSnackBar('Login successful!');
-        Navigator.pushReplacementNamed(context, '/home');
+        if (mounted) {
+          Navigator.pushReplacementNamed(context, '/home');
+        }
       } else {
         _showSnackBar(result['message'], isError: true);
       }
