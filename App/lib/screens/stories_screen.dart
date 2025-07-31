@@ -96,8 +96,8 @@ class _StoriesScreenState extends State<StoriesScreen> {
                                 );
                               },
                               child: _StoryListItem(
-                                imagePath:
-                                    'assets/images/adire_art.png', // Placeholder
+                                imagePath: story.imageUrl ??
+                                    '', // No image - will show gradient
                                 title: story.title,
                                 description: story.text.length > 60
                                     ? '${story.text.substring(0, 60)}...'
@@ -172,12 +172,41 @@ class _StoryListItem extends StatelessWidget {
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(12),
-            child: Image.asset(
-              imagePath,
-              width: 56,
-              height: 56,
-              fit: BoxFit.cover,
-            ),
+            child: imagePath.isNotEmpty
+                ? Image.asset(
+                    imagePath,
+                    width: 56,
+                    height: 56,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => Container(
+                      width: 56,
+                      height: 56,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            Colors.orange.shade100,
+                            Colors.pink.shade100,
+                          ],
+                        ),
+                      ),
+                    ),
+                  )
+                : Container(
+                    width: 56,
+                    height: 56,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Colors.orange.shade100,
+                          Colors.pink.shade100,
+                        ],
+                      ),
+                    ),
+                  ),
           ),
           const SizedBox(width: 12),
           Expanded(
