@@ -175,14 +175,14 @@ class _StoryListItem extends StatelessWidget {
                 ? (imagePath!.startsWith('http')
                     ? Image.network(
                         imagePath!,
-                        width: 56,
-                        height: 56,
+                        width: 100,
+                        height: 76,
                         fit: BoxFit.cover,
                         loadingBuilder: (context, child, loadingProgress) {
                           if (loadingProgress == null) return child;
                           return Container(
-                            width: 56,
-                            height: 56,
+                            width: 100,
+                            height: 76,
                             color: Colors.grey[200],
                             child: const Center(
                               child: SizedBox(
@@ -195,8 +195,8 @@ class _StoryListItem extends StatelessWidget {
                           );
                         },
                         errorBuilder: (context, error, stackTrace) => Container(
-                          width: 56,
-                          height: 56,
+                          width: 100,
+                          height: 76,
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               begin: Alignment.topLeft,
@@ -211,12 +211,12 @@ class _StoryListItem extends StatelessWidget {
                       )
                     : Image.asset(
                         imagePath!,
-                        width: 56,
-                        height: 56,
+                        width: 100,
+                        height: 76,
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) => Container(
-                          width: 56,
-                          height: 56,
+                          width: 100,
+                          height: 76,
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               begin: Alignment.topLeft,
@@ -230,8 +230,8 @@ class _StoryListItem extends StatelessWidget {
                         ),
                       ))
                 : Container(
-                    width: 56,
-                    height: 56,
+                    width: 100,
+                    height: 76,
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.topLeft,
@@ -253,7 +253,7 @@ class _StoryListItem extends StatelessWidget {
                   title,
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 15,
+                    fontSize: 16,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -262,7 +262,7 @@ class _StoryListItem extends StatelessWidget {
                 Text(
                   description,
                   style: const TextStyle(
-                    fontSize: 13,
+                    fontSize: 14,
                     color: Colors.black87,
                   ),
                   maxLines: 2,
