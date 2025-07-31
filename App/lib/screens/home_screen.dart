@@ -170,16 +170,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const SizedBox(height: 12),
                   SizedBox(
-                    height: 190, // Increased height to prevent overflow
+                    height: 240, // Increased height for better visibility
                     child: _isLoading
                         ? const Center(child: CircularProgressIndicator())
                         : ListView.separated(
                             scrollDirection: Axis.horizontal,
-                            itemCount: _searchController.text.isNotEmpty
-                                ? _filteredEvents.length
-                                : (_filteredEvents.length > 2
-                                    ? 2
-                                    : _filteredEvents.length),
+                            padding: const EdgeInsets.symmetric(horizontal: 0),
+                            itemCount: _filteredEvents.length,
                             separatorBuilder: (context, index) =>
                                 const SizedBox(width: 16),
                             itemBuilder: (context, index) {
@@ -192,13 +189,17 @@ class _HomeScreenState extends State<HomeScreen> {
                                     arguments: event,
                                   );
                                 },
-                                child: _EventCard(
-                                  imagePath: event.images.isNotEmpty
-                                      ? event.images.first
-                                      : 'assets/images/event1.png',
-                                  isNetworkImage: event.images.isNotEmpty,
-                                  title: event.title,
-                                  description: event.description,
+                                child: SizedBox(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.6,
+                                  child: _EventCard(
+                                    imagePath: event.images.isNotEmpty
+                                        ? event.images.first
+                                        : null,
+                                    isNetworkImage: event.images.isNotEmpty,
+                                    title: event.title,
+                                    description: event.description,
+                                  ),
                                 ),
                               );
                             },
@@ -235,7 +236,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       );
                                     },
                                     child: _StoryCard(
-                                      imagePath: 'assets/images/story1.png',
+                                      imagePath: null,
                                       title: story.title,
                                       description: story.text.length > 60
                                           ? '${story.text.substring(0, 60)}...'
@@ -245,65 +246,54 @@ class _HomeScreenState extends State<HomeScreen> {
                                 );
                               }).toList(),
                             )
-                          : LayoutBuilder(
-                              builder: (context, constraints) {
-                                final cardWidth =
-                                    (constraints.maxWidth - 16) / 2;
-                                return Row(
-                                  children: [
-                                    SizedBox(
-                                      width: cardWidth,
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          Navigator.pushNamed(
-                                            context,
-                                            '/story_details',
-                                            arguments: _filteredStories[0],
-                                          );
-                                        },
-                                        child: _StoryCard(
-                                          imagePath: 'assets/images/story1.png',
-                                          title: _filteredStories[0].title,
-                                          description: _filteredStories[0]
-                                                      .text
-                                                      .length >
-                                                  60
-                                              ? '${_filteredStories[0].text.substring(0, 60)}...'
-                                              : _filteredStories[0].text,
-                                        ),
-                                      ),
+                          : Row(
+                              children: [
+                                Expanded(
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      Navigator.pushNamed(
+                                        context,
+                                        '/story_details',
+                                        arguments: _filteredStories[0],
+                                      );
+                                    },
+                                    child: _StoryCard(
+                                      imagePath: null,
+                                      title: _filteredStories[0].title,
+                                      description: _filteredStories[0]
+                                                  .text
+                                                  .length >
+                                              60
+                                          ? '${_filteredStories[0].text.substring(0, 60)}...'
+                                          : _filteredStories[0].text,
                                     ),
-                                    const SizedBox(width: 16),
-                                    SizedBox(
-                                      width: cardWidth,
-                                      child: _filteredStories.length > 1
-                                          ? GestureDetector(
-                                              onTap: () {
-                                                Navigator.pushNamed(
-                                                  context,
-                                                  '/story_details',
-                                                  arguments:
-                                                      _filteredStories[1],
-                                                );
-                                              },
-                                              child: _StoryCard(
-                                                imagePath:
-                                                    'assets/images/story1.png',
-                                                title:
-                                                    _filteredStories[1].title,
-                                                description: _filteredStories[1]
-                                                            .text
-                                                            .length >
-                                                        60
-                                                    ? '${_filteredStories[1].text.substring(0, 60)}...'
-                                                    : _filteredStories[1].text,
-                                              ),
-                                            )
-                                          : null, // Empty space if only one story
-                                    ),
-                                  ],
-                                );
-                              },
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: _filteredStories.length > 1
+                                      ? GestureDetector(
+                                          onTap: () {
+                                            Navigator.pushNamed(
+                                              context,
+                                              '/story_details',
+                                              arguments: _filteredStories[1],
+                                            );
+                                          },
+                                          child: _StoryCard(
+                                            imagePath: null,
+                                            title: _filteredStories[1].title,
+                                            description: _filteredStories[1]
+                                                        .text
+                                                        .length >
+                                                    60
+                                                ? '${_filteredStories[1].text.substring(0, 60)}...'
+                                                : _filteredStories[1].text,
+                                          ),
+                                        )
+                                      : Container(), // Empty space if only one story
+                                ),
+                              ],
                             ),
                 ],
                 const SizedBox(height: 32),
@@ -347,13 +337,13 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class _EventCard extends StatelessWidget {
-  final String imagePath;
+  final String? imagePath;
   final String title;
   final String description;
   final bool isNetworkImage;
 
   const _EventCard({
-    required this.imagePath,
+    this.imagePath,
     required this.title,
     required this.description,
     this.isNetworkImage = false,
@@ -363,7 +353,6 @@ class _EventCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 200,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -383,48 +372,68 @@ class _EventCard extends StatelessWidget {
               topLeft: Radius.circular(16),
               topRight: Radius.circular(16),
             ),
-            child: isNetworkImage
-                ? Image.network(
-                    imagePath,
-                    height: 100,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return Container(
-                        height: 100,
-                        color: Colors.grey[200],
-                        child: const Center(
-                          child: CircularProgressIndicator(),
+            child: imagePath != null
+                ? (isNetworkImage
+                    ? Image.network(
+                        imagePath!,
+                        height: 130,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Container(
+                            height: 130,
+                            color: Colors.grey[200],
+                            child: const Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                          );
+                        },
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            height: 130,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  Colors.blue.shade100,
+                                  Colors.purple.shade100,
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      )
+                    : Image.asset(
+                        imagePath!,
+                        height: 130,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          height: 130,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                Colors.blue.shade100,
+                                Colors.purple.shade100,
+                              ],
+                            ),
+                          ),
                         ),
-                      );
-                    },
-                    errorBuilder: (context, error, stackTrace) {
-                      print(
-                          'Failed to load event image: $imagePath, Error: $error');
-                      return Container(
-                        height: 100,
-                        color: Colors.grey[300],
-                        child: const Icon(
-                          Icons.event,
-                          size: 40,
-                          color: Colors.grey,
-                        ),
-                      );
-                    },
-                  )
-                : Image.asset(
-                    imagePath,
-                    height: 100,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Container(
-                      height: 100,
-                      color: Colors.grey[300],
-                      child: const Icon(
-                        Icons.event,
-                        size: 40,
-                        color: Colors.grey,
+                      ))
+                : Container(
+                    height: 130,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Colors.blue.shade100,
+                          Colors.purple.shade100,
+                        ],
                       ),
                     ),
                   ),
@@ -463,12 +472,12 @@ class _EventCard extends StatelessWidget {
 }
 
 class _StoryCard extends StatelessWidget {
-  final String imagePath;
+  final String? imagePath;
   final String title;
   final String description;
 
   const _StoryCard({
-    required this.imagePath,
+    this.imagePath,
     required this.title,
     required this.description,
     Key? key,
@@ -477,6 +486,7 @@ class _StoryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      height: 180, // Fixed height for consistent sizing
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -496,34 +506,69 @@ class _StoryCard extends StatelessWidget {
               topLeft: Radius.circular(16),
               topRight: Radius.circular(16),
             ),
-            child: Image.asset(
-              imagePath,
-              height: 80,
-              width: double.infinity,
-              fit: BoxFit.cover,
-            ),
+            child: imagePath != null
+                ? Image.asset(
+                    imagePath!,
+                    height: 100,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => Container(
+                      height: 100,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            Colors.orange.shade100,
+                            Colors.pink.shade100,
+                          ],
+                        ),
+                      ),
+                    ),
+                  )
+                : Container(
+                    height: 100,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Colors.orange.shade100,
+                          Colors.pink.shade100,
+                        ],
+                      ),
+                    ),
+                  ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  description,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Colors.black87,
+                  const SizedBox(height: 4),
+                  Expanded(
+                    child: Text(
+                      description,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.black87,
+                      ),
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ],
