@@ -170,6 +170,70 @@ class ApiService {
     }
   }
 
+  // Fetch events by category
+  static Future<List<Event>> fetchEventsByCategory(String category) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/events/category/$category'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+        return data.map((e) => Event.fromJson(e)).toList();
+      } else {
+        return [];
+      }
+    } catch (e) {
+      return [];
+    }
+  }
+
+  // Fetch events by date range
+  static Future<List<Event>> fetchEventsByDateRange(DateTime fromDate, DateTime toDate) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/events/date-range'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'fromDate': fromDate.toIso8601String(),
+          'toDate': toDate.toIso8601String(),
+        }),
+      );
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+        return data.map((e) => Event.fromJson(e)).toList();
+      } else {
+        return [];
+      }
+    } catch (e) {
+      return [];
+    }
+  }
+
+  // Fetch nearby events
+  static Future<List<Event>> fetchNearbyEvents(double latitude, double longitude, {double radius = 10.0}) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/events/search/nearby?lat=$latitude&lng=$longitude&radius=$radius'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+        return data.map((e) => Event.fromJson(e)).toList();
+      } else {
+        return [];
+      }
+    } catch (e) {
+      return [];
+    }
+  }
+
   // Fetch stories
   static Future<List<Story>> fetchStories() async {
     try {

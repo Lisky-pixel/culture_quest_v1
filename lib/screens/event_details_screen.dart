@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../models/event.dart';
 
 class EventDetailsScreen extends StatelessWidget {
@@ -80,7 +81,7 @@ class EventDetailsScreen extends StatelessWidget {
                       Text(
                         event.description,
                         style: const TextStyle(
-                          fontSize: 15,
+                          fontSize: 16,
                           color: Colors.black87,
                         ),
                       ),
@@ -89,14 +90,14 @@ class EventDetailsScreen extends StatelessWidget {
                         'Date & Time',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                          fontSize: 18,
                         ),
                       ),
                       const SizedBox(height: 6),
                       Text(
                         _formatEventDateTime(event),
                         style: const TextStyle(
-                          fontSize: 15,
+                          fontSize: 16,
                           color: Colors.black87,
                         ),
                       ),
@@ -105,20 +106,11 @@ class EventDetailsScreen extends StatelessWidget {
                         'Location',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                          fontSize: 18,
                         ),
                       ),
                       const SizedBox(height: 10),
-                      if (event.coordinates != null)
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(16),
-                          child: Image.asset(
-                            'assets/images/ghana_map.png',
-                            height: 100,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
+                      _buildMapWidget(event),
                       const SizedBox(height: 10),
                       Text(
                         event.venue.isNotEmpty ? event.venue : event.address,
@@ -141,12 +133,147 @@ class EventDetailsScreen extends StatelessWidget {
   String _formatEventDateTime(Event event) {
     final start = event.startDate;
     final end = event.endDate;
-    final date =
-        '${start.year}-${_twoDigits(start.month)}-${_twoDigits(start.day)}';
-    final startTime = '${_twoDigits(start.hour)}:${_twoDigits(start.minute)}';
-    final endTime = '${_twoDigits(end.hour)}:${_twoDigits(end.minute)}';
+
+    // Day names
+    const dayNames = [
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday'
+    ];
+
+    // Month names
+    const monthNames = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December'
+    ];
+
+    final dayName = dayNames[start.weekday - 1];
+    final monthName = monthNames[start.month - 1];
+    final date = '$dayName, $monthName ${start.day}, ${start.year}';
+
+    final startTime = _formatTime(start);
+    final endTime = _formatTime(end);
+
     return '$date · $startTime - $endTime';
   }
 
-  String _twoDigits(int n) => n.toString().padLeft(2, '0');
+  String _formatTime(DateTime dateTime) {
+    final hour = dateTime.hour;
+    final minute = dateTime.minute;
+    final period = hour >= 12 ? 'PM' : 'AM';
+    final displayHour = hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour);
+    final displayMinute = minute.toString().padLeft(2, '0');
+
+    return '$displayHour:$displayMinute $period';
+  }
+
+  Widget _buildMapWidget(Event event) {
+    // Check if coordinates are available and valid
+    if (event.coordinates == null ||
+        (event.coordinates!.latitude == 0.0 &&
+            event.coordinates!.longitude == 0.0)) {
+      return Container(
+        height: 200,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: Colors.grey[200],
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: const Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.location_off, size: 48, color: Colors.grey),
+              SizedBox(height: 8),
+              Text(
+                'Location not available',
+                style: TextStyle(color: Colors.grey, fontSize: 16),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: SizedBox(
+        height: 200,
+        width: double.infinity,
+        child: _buildSafeGoogleMap(event),
+      ),
+    );
+  }
+
+  Widget _buildSafeGoogleMap(Event event) {
+    try {
+      return GoogleMap(
+        initialCameraPosition: CameraPosition(
+          target: LatLng(
+            event.coordinates!.latitude,
+            event.coordinates!.longitude,
+          ),
+          zoom: 15.0,
+        ),
+        markers: {
+          Marker(
+            markerId: const MarkerId('event_location'),
+            position: LatLng(
+              event.coordinates!.latitude,
+              event.coordinates!.longitude,
+            ),
+            infoWindow: InfoWindow(
+              title: event.title,
+              snippet: event.venue.isNotEmpty ? event.venue : event.address,
+            ),
+          ),
+        },
+        mapType: MapType.normal,
+        myLocationButtonEnabled: false,
+        zoomControlsEnabled: false,
+        onMapCreated: (GoogleMapController controller) {
+          // Map created successfully
+        },
+      );
+    } catch (e) {
+      // Fallback if Google Maps fails to load
+      return Container(
+        decoration: BoxDecoration(
+          color: Colors.grey[100],
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: const Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.map, size: 48, color: Colors.grey),
+              SizedBox(height: 8),
+              Text(
+                'Map temporarily unavailable',
+                style: TextStyle(color: Colors.grey, fontSize: 16),
+              ),
+              Text(
+                'Please check your internet connection',
+                style: TextStyle(color: Colors.grey, fontSize: 12),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+  }
 }
