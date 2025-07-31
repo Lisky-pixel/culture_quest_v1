@@ -96,8 +96,7 @@ class _StoriesScreenState extends State<StoriesScreen> {
                                 );
                               },
                               child: _StoryListItem(
-                                imagePath: story.imageUrl ??
-                                    '', // No image - will show gradient
+                                imagePath: story.videoUrl,
                                 title: story.title,
                                 description: story.text.length > 60
                                     ? '${story.text.substring(0, 60)}...'
@@ -151,12 +150,12 @@ class _StoriesScreenState extends State<StoriesScreen> {
 enum _StoryIconType { audio, book }
 
 class _StoryListItem extends StatelessWidget {
-  final String imagePath;
+  final String? imagePath;
   final String title;
   final String description;
   final _StoryIconType iconType;
   const _StoryListItem({
-    required this.imagePath,
+    this.imagePath,
     required this.title,
     required this.description,
     required this.iconType,
@@ -172,27 +171,64 @@ class _StoryListItem extends StatelessWidget {
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(12),
-            child: imagePath.isNotEmpty
-                ? Image.asset(
-                    imagePath,
-                    width: 56,
-                    height: 56,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Container(
-                      width: 56,
-                      height: 56,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            Colors.orange.shade100,
-                            Colors.pink.shade100,
-                          ],
+            child: imagePath != null && imagePath!.isNotEmpty
+                ? (imagePath!.startsWith('http')
+                    ? Image.network(
+                        imagePath!,
+                        width: 56,
+                        height: 56,
+                        fit: BoxFit.cover,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Container(
+                            width: 56,
+                            height: 56,
+                            color: Colors.grey[200],
+                            child: const Center(
+                              child: SizedBox(
+                                width: 20,
+                                height: 20,
+                                child:
+                                    CircularProgressIndicator(strokeWidth: 2),
+                              ),
+                            ),
+                          );
+                        },
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          width: 56,
+                          height: 56,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                Colors.orange.shade100,
+                                Colors.pink.shade100,
+                              ],
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                  )
+                      )
+                    : Image.asset(
+                        imagePath!,
+                        width: 56,
+                        height: 56,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          width: 56,
+                          height: 56,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                Colors.orange.shade100,
+                                Colors.pink.shade100,
+                              ],
+                            ),
+                          ),
+                        ),
+                      ))
                 : Container(
                     width: 56,
                     height: 56,

@@ -411,14 +411,14 @@ class _StoryDetailsScreenState extends State<StoryDetailsScreen> {
   }
 
   Widget _buildStoryImage(Story story) {
-    if (story.imageUrl == null ||
-        story.imageUrl!.isEmpty ||
-        story.imageUrl!.contains('example.com')) {
+    if (story.videoUrl == null ||
+        story.videoUrl!.isEmpty ||
+        story.videoUrl!.contains('example.com')) {
       return _buildPlaceholderContainer();
     }
 
     return Image.network(
-      story.imageUrl!,
+      story.videoUrl!,
       fit: BoxFit.cover,
       loadingBuilder: (context, child, loadingProgress) {
         if (loadingProgress == null) return child;
@@ -447,9 +447,9 @@ class _StoryDetailsScreenState extends State<StoryDetailsScreen> {
   }
 
   Widget _buildAudioPlayerImage(Story story) {
-    if (story.imageUrl == null ||
-        story.imageUrl!.isEmpty ||
-        story.imageUrl!.contains('example.com')) {
+    if (story.videoUrl == null ||
+        story.videoUrl!.isEmpty ||
+        story.videoUrl!.contains('example.com')) {
       return Container(
         width: 40,
         height: 40,
@@ -472,7 +472,7 @@ class _StoryDetailsScreenState extends State<StoryDetailsScreen> {
     }
 
     return Image.network(
-      story.imageUrl!,
+      story.videoUrl!,
       width: 40,
       height: 40,
       fit: BoxFit.cover,
