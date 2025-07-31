@@ -606,7 +606,9 @@ class _EventListItem extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  description,
+                  description.length > 120
+                      ? '${description.substring(0, 120)}...'
+                      : description,
                   style: const TextStyle(
                     fontSize: 14,
                     color: Colors.black87,
@@ -621,20 +623,20 @@ class _EventListItem extends StatelessWidget {
             child: isNetworkImage
                 ? Image.network(
                     imagePath,
-                    width: 90,
-                    height: 90,
+                    width: 130,
+                    height: 133,
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) => Image.asset(
                       'assets/images/event1.png',
-                      width: 90,
-                      height: 90,
+                      width: 130,
+                      height: 133,
                       fit: BoxFit.cover,
                     ),
                   )
                 : Image.asset(
                     imagePath,
-                    width: 90,
-                    height: 90,
+                    width: 130,
+                    height: 133,
                     fit: BoxFit.cover,
                   ),
           ),

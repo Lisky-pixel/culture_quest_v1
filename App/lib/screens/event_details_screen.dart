@@ -46,20 +46,7 @@ class EventDetailsScreen extends StatelessWidget {
               color: const Color(0xFFF7EFE7),
               child: AspectRatio(
                 aspectRatio: 2.2,
-                child: event.images.isNotEmpty
-                    ? Image.network(
-                        event.images.first,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) =>
-                            Image.asset(
-                          'assets/images/event_details.png',
-                          fit: BoxFit.cover,
-                        ),
-                      )
-                    : Image.asset(
-                        'assets/images/event_details.png',
-                        fit: BoxFit.cover,
-                      ),
+                child: _buildEventImage(event),
               ),
             ),
             Expanded(
@@ -275,5 +262,60 @@ class EventDetailsScreen extends StatelessWidget {
         ),
       );
     }
+  }
+
+  Widget _buildEventImage(Event event) {
+    // Check if we have a valid image URL (not example.com or empty)
+    if (event.images.isEmpty ||
+        event.images.first.isEmpty ||
+        event.images.first.contains('example.com')) {
+      return _buildEventPlaceholder();
+    }
+
+    return Image.network(
+      event.images.first,
+      fit: BoxFit.cover,
+      loadingBuilder: (context, child, loadingProgress) {
+        if (loadingProgress == null) return child;
+        return Container(
+          color: const Color(0xFFF7EFE7),
+          child: const Center(
+            child: CircularProgressIndicator(
+              color: Colors.orange,
+            ),
+          ),
+        );
+      },
+      errorBuilder: (context, error, stackTrace) {
+        return _buildEventPlaceholder();
+      },
+    );
+  }
+
+  Widget _buildEventPlaceholder() {
+    return Container(
+      color: const Color(0xFFF7EFE7),
+      child: const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.event,
+              size: 48,
+              color: Colors.orange,
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Event Image',
+              style: TextStyle(
+                color: Colors.orange,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
